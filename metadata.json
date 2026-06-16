@@ -1,0 +1,6 @@
+{
+  "name": "IP Scanner",
+  "description": "A high-precision IP reputation scanner filtering ArcSight logs against VirusTotal v3.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

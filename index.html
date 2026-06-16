@@ -1,0 +1,3754 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<title>IP Scanner</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2.2'%3E%3Ccircle cx='12' cy='12' r='10' stroke-dasharray='3 3'/%3E%3Cpath d='M12 2a10 10 0 0 1 10 10' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='12' r='3.5' fill='%2300f0ff'/%3E%3C/svg%3E">
+<style>
+/* ── RESET, TYPOGRAPHY & SMOOTHING ── */
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── THEME TOKENS (HIGH-END CYBERSECURITY ENGINE) ── */
+[data-theme="dark"] {
+  --bg: #060813;
+  --bg2: #0b0f19;
+  --surface: #0e1324;
+  --surface2: #161a30;
+  --surface3: #222744;
+  --border: rgba(0, 240, 255, 0.12);
+  --border2: rgba(0, 240, 255, 0.25);
+  --text: #f9fafb;
+  --text2: #e2e8f0;
+  --muted: #94a3b8;
+  --cyan: #00f0ff;
+  --cyan-dim: rgba(0, 240, 255, 0.08);
+  --red: #ff4a6b;
+  --red-dim: rgba(255, 74, 107, 0.1);
+  --green: #10b981;
+  --green-dim: rgba(16, 185, 129, 0.1);
+  --amber: #f59e0b;
+  --amber-dim: rgba(245, 158, 11, 0.1);
+  --purple: #d946ef;
+  --purple-dim: rgba(217, 70, 239, 0.1);
+  --accent: var(--cyan);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 12px 24px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 24px 48px rgba(0, 0, 0, 0.85);
+  --input-bg: #080a14;
+}
+
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg2: #f1f5f9;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --surface3: #f1f5f9;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --text: #0f172a;
+  --text2: #334155;
+  --muted: #64748b;
+  --cyan: #2563eb;
+  --cyan-dim: rgba(37, 99, 235, 0.08);
+  --red: #dc2626;
+  --red-dim: rgba(220, 38, 38, 0.08);
+  --green: #16a34a;
+  --green-dim: rgba(22, 163, 74, 0.08);
+  --amber: #ca8a04;
+  --amber-dim: rgba(202, 138, 4, 0.08);
+  --purple: #7c3aed;
+  --purple-dim: rgba(124, 58, 237, 0.08);
+  --accent: var(--cyan);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 18px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 20px 32px rgba(15, 23, 42, 0.07);
+  --input-bg: #ffffff;
+}
+
+/* ── BODY & LAYOUT ── */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem;
+  font-size: 14px;
+  line-height: 1.6;
+  transition: background 0.25s ease, color 0.25s ease;
+  letter-spacing: -0.011em;
+}
+
+.wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* ── DASHBOARD GRID LAYOUT ── */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 460px 1fr;
+  }
+}
+.side-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.side-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── HEADER ── */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 1.5rem 2rem;
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.hdr::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+}
+
+.hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 15px var(--cyan-dim);
+}
+
+.logo svg {
+  stroke: #ffffff !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.hdr-title h1 {
+  font-size: 1.4rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.hdr-title p {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-weight: 550;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow);
+  gap: 8px;
+}
+
+.icon-btn:hover {
+  border-color: var(--cyan);
+  color: var(--text);
+  background: var(--cyan-dim);
+}
+
+.icon-btn.api-key-btn {
+  font-size: 12px;
+}
+
+/* ── CARDS (GLASS Dash & Bento feel) ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s ease;
+}
+
+/* ── SETTINGS GRID ── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.setting-group {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+/* Labels on each card & group */
+.label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── TAGS ── */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 32px;
+}
+
+.tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text2);
+  box-shadow: var(--shadow);
+}
+
+.tag-remove {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 700;
+  line-height: 1;
+  font-size: 13px;
+  transition: color 0.15s;
+}
+
+.tag-remove:hover {
+  color: var(--red);
+}
+
+.add-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.add-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 12.5px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.add-input input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+
+.add-input button {
+  padding: 8px 14px;
+  font-size: 11.5px;
+  border-radius: 6px;
+}
+
+/* ── THRESHOLD STEPPER ── */
+.threshold-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.threshold-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.step-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.step-btn:hover:not(:disabled) {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+}
+
+.threshold-display {
+  min-width: 52px;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--cyan);
+  padding: 0 6px;
+}
+
+input[type=range] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface2);
+  cursor: pointer;
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  cursor: pointer;
+  transition: transform 0.1s;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+/* ── DATA INPUT TABS ── */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+  border: none !important;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border) !important;
+  border-radius: 50px !important;
+  font-size: 12.5px;
+  color: var(--muted);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: none;
+}
+
+.tab-btn:hover {
+  color: #ffffff;
+  border-color: var(--border2) !important;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn.active {
+  background: rgba(0, 240, 255, 0.05) !important;
+  color: #00f0ff !important;
+  border: 2px solid #00f0ff !important;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6) !important;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ── UPLOAD AREA ── */
+.upload-area {
+  border: 2px dashed var(--border2);
+  border-radius: 12px;
+  padding: 3rem 2.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--bg2);
+  position: relative;
+}
+
+.upload-area:hover, .upload-area.drag-over {
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--cyan-dim);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  color: var(--cyan);
+}
+
+.upload-area p {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.upload-area small {
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: 6px;
+  display: block;
+}
+
+/* ── TEXTAREA INPUTS ── */
+textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.5;
+}
+
+textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+
+.ip-list-input {
+  min-height: 180px;
+}
+
+/* ── BUTTONS & ACTIONS ── */
+button {
+  padding: 10px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow);
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--border2);
+  background: var(--bg2);
+  color: var(--text);
+}
+
+button.primary, .primary-cyber-glow {
+  background: #00f0ff !important;
+  color: #030712 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button.primary:hover:not(:disabled), .primary-cyber-glow:hover:not(:disabled) {
+  background: #26f4ff !important;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.95) !important;
+  transform: translateY(-1px);
+}
+
+button.primary:disabled, .primary-cyber-glow:disabled {
+  background: rgba(0, 240, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  opacity: 0.5;
+}
+
+button.danger {
+  background: transparent;
+  border-color: var(--red);
+  color: var(--red);
+}
+
+button.danger:hover:not(:disabled) {
+  background: var(--red-dim);
+  color: var(--red);
+}
+
+button.stop-btn {
+  background: var(--red-dim);
+  border-color: var(--red);
+  color: var(--red);
+  border-radius: 8px;
+  display: none;
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.helper-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── PROGRESS MATRIX ── */
+.progress-container {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: var(--bg2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: none;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
+  background-size: 200% 100%;
+  border-radius: 4px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: shimmer 1.8s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.progress-text {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── RATE LIMIT BAR ── */
+.rate-limit-notice {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  background: var(--amber-dim);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--amber);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rate-limit-notice.visible {
+  display: flex;
+}
+
+.rate-limit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse-dot 1.2s infinite;
+}
+
+/* ── STATS METRICS PANEL ── */
+.stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  flex: 1;
+  min-width: 140px;
+  position: relative;
+  text-align: center;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+
+.stat-card.stat-total {
+  border-left: 4px solid var(--cyan);
+}
+.stat-card.stat-malicious {
+  border-left: 4px solid var(--red);
+  background: var(--red-dim);
+}
+.stat-card.stat-suspicious {
+  border-left: 4px solid var(--amber);
+  background: var(--amber-dim);
+}
+.stat-card.stat-clean {
+  border-left: 4px solid var(--green);
+  background: var(--green-dim);
+}
+
+.stat-value {
+  font-size: 2.1rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.stat-card.stat-total .stat-value { color: var(--cyan); }
+.stat-card.stat-malicious .stat-value { color: var(--red); }
+.stat-card.stat-suspicious .stat-value { color: var(--amber); }
+.stat-card.stat-clean .stat-value { color: var(--green); }
+
+.stat-label {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ── FILTER CHIPS ROW ── */
+.results-controls {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.filter-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-btn:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.filter-btn.active-all {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.filter-btn.active-malicious {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.filter-btn.active-suspicious {
+  background: var(--amber-dim);
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.filter-btn.active-clean {
+  background: var(--green-dim);
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.ip-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+  margin-left: auto;
+}
+
+.ip-search-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted);
+}
+
+.ip-search-input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 12.5px;
+  font-family: 'JetBrains Mono', monospace;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.ip-search-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+
+#vtPctSelectFilter {
+  max-width: 154px;
+  font-size: 12px;
+  padding: 6px 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#vtPctSelectFilter:hover {
+  border-color: var(--cyan);
+  color: var(--text);
+}
+
+/* FILTER EXPLAINER PANEL */
+.filter-summary {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 1.1rem 1.4rem;
+  margin-top: 1.25rem;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+
+.filter-summary ul {
+  margin-left: 1.4rem;
+  margin-top: 0.5rem;
+}
+
+.filter-summary li {
+  color: var(--text2);
+  margin: 6px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+}
+
+/* ── RESULTS GRID TABLE ── */
+.table-container {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  max-height: 480px;
+  overflow-y: auto;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.table-container.expanded {
+  max-height: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  background: var(--bg2);
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr {
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+tbody tr:hover td {
+  background: var(--bg2) !important;
+}
+
+tr.row-malicious td {
+  background: rgba(239, 68, 68, 0.03);
+}
+tr.row-malicious:hover td {
+  background: rgba(239, 68, 68, 0.07) !important;
+}
+
+tr.row-suspicious td {
+  background: rgba(245, 158, 11, 0.03);
+}
+tr.row-suspicious:hover td {
+  background: rgba(245, 158, 11, 0.07) !important;
+}
+
+tr.row-clean td {
+  background: rgba(16, 185, 129, 0.01);
+}
+tr.row-clean:hover td {
+  background: rgba(16, 185, 129, 0.05) !important;
+}
+
+tr.row-error td {
+  background: rgba(156, 163, 175, 0.02);
+}
+
+/* Status Badgifying */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+}
+
+.badge-malicious {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge-suspicious {
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-clean {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-error {
+  background: var(--surface3);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.badge-scanning {
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* IP Cell Actions hover-reveal */
+.ip-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+.ip-cell-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.copy-ip-btn {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  color: var(--muted);
+}
+
+tbody tr:hover .copy-ip-btn {
+  opacity: 1;
+}
+
+.copy-ip-btn:hover {
+  color: var(--cyan);
+  background: var(--cyan-dim);
+}
+
+.ip-detail-btn {
+  background: none;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text2);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.ip-detail-btn:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+}
+
+/* ── CHARTS SECTION PANEL ── */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.chart-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.chart-box-title {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.chart-canvas-wrap {
+  position: relative;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── INTERACTIVE MODALS (MODERN FROSTED) ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 7, 18, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 2.25rem;
+  width: 100%;
+  max-width: 580px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-overlay.open .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  border-color: var(--border2);
+  background: var(--surface2);
+}
+
+.modal-ip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-copy-btn {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text2);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.modal-copy-btn:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+}
+
+.modal-country {
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 1.5rem;
+}
+
+.modal-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.modal-stat {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 1rem 0.75rem;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.modal-stat-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.modal-stat-lbl {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 5px;
+  font-weight: 700;
+}
+
+.modal-stat.ms-malicious .modal-stat-val { color: var(--red); }
+.modal-stat.ms-suspicious .modal-stat-val { color: var(--amber); }
+.modal-stat.ms-clean .modal-stat-val { color: var(--green); }
+.modal-stat.ms-total .modal-stat-val { color: var(--cyan); }
+
+.detection-bar {
+  margin-bottom: 1.5rem;
+}
+
+.detection-bar-label {
+  font-size: 12px;
+  color: var(--text2);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.detection-bar-track {
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.detection-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vendor-section {
+  margin-top: 1.25rem;
+}
+
+.vendor-section-title {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vendor-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vendor-tag {
+  font-size: 10.5px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.vendor-tag.vt-malicious {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.vendor-tag.vt-suspicious {
+  background: var(--amber-dim);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.modal-vt-link {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  text-align: center;
+  padding: 12px;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-vt-link:hover {
+  background: var(--cyan);
+  color: #ffffff;
+  border-color: var(--cyan);
+}
+
+/* ── API KEY MODAL PANEL ── */
+.apikey-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 2.25rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.apikey-input {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  outline: none;
+  margin: 14px 0;
+  transition: all 0.2s;
+}
+
+.apikey-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px var(--cyan-dim);
+}
+
+.apikey-status {
+  font-size: 11.5px;
+  font-family: 'Inter', sans-serif;
+  margin-top: 6px;
+  min-height: 20px;
+  font-weight: 600;
+}
+
+.apikey-status.ok { color: var(--green); }
+.apikey-status.err { color: var(--red); }
+
+/* ── SOLID STATE TOASTS ── */
+.toast {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.toast-success { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.toast.toast-error { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.toast.toast-warn { border-color: var(--amber); color: var(--amber); background: var(--amber-dim); }
+
+/* ── MICRO ANIMATIONS ── */
+.scan-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cyan);
+  display: inline-block;
+  box-shadow: 0 0 10px var(--cyan);
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.error-cell {
+  color: var(--muted);
+  font-size: 11.5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-style: italic;
+}
+
+.cache-tag {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  font-size: 9px;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* ── CUSTOM SCROLLBARS ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ── COLLAPSIBLE PANEL & SIDEBAR STYLES ── */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0 4px;
+}
+
+.sidebar-title-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.sidebar-toggle-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+.sidebar-toggle-btn span {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Header Icon Wrapper Styles */
+.header-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.header-icon-svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--cyan);
+  transition: stroke 0.25s ease;
+}
+
+.collapsible-card .card-header-toggle:hover .header-icon-wrap {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+}
+
+.card-header-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text2);
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.collapsible-card .card-header-toggle:hover .card-header-title {
+  color: var(--text);
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    transition: grid-template-columns 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .dashboard-grid.sidebar-collapsed {
+    grid-template-columns: 80px 1fr !important;
+  }
+  
+  .side-left {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .side-left.collapsed {
+    width: 80px !important;
+    min-width: 80px !important;
+    align-items: center;
+  }
+
+  .side-left.collapsed #unifiedLeftPanel {
+    width: 78px !important;
+    min-width: 78px !important;
+    height: calc(100vh - 100px);
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    background: #000000 !important;
+    border-right: 1px solid rgba(0, 240, 255, 0.15) !important;
+    margin-bottom: 0;
+  }
+
+  .side-left.collapsed .card-header-toggle,
+  .side-left.collapsed .card-content {
+    display: none !important;
+  }
+
+  /* ── COLLAPSED VERTICAL ICONS CONTENT ── */
+  .collapsed-view-content {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    min-height: 520px;
+    width: 100%;
+    padding: 1.5rem 0;
+    box-sizing: border-box;
+  }
+
+  .side-left.collapsed .collapsed-view-content {
+    display: flex !important;
+  }
+
+  .collapsed-top-icons, .collapsed-bottom-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    align-items: center;
+  }
+
+  .collapsed-icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .collapsed-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #00f0ff;
+    transform: scale(1.08);
+  }
+
+  .collapsed-icon-btn.glow-cyan {
+    color: #00f0ff;
+    background: rgba(0, 240, 255, 0.08);
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+
+  .collapsed-avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #10b981;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .collapsed-avatar-circle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.7);
+  }
+
+  /* Collapsed Custom tooltips */
+  .collapsed-icon-btn[title]::before,
+  .collapsed-avatar-circle[title]::before {
+    content: attr(title);
+    position: absolute;
+    left: 56px;
+    background: #090d16;
+    color: #ffffff;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(-10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    border: 1px solid var(--border2);
+    z-index: 99;
+    letter-spacing: 0.02em;
+  }
+
+  .collapsed-icon-btn:hover::before,
+  .collapsed-avatar-circle:hover::before {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── INDIVIDUAL COLLAPSIBLE CARDS (Expanded View) ── */
+.collapsible-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.collapsible-card .card-header-toggle {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  user-select: none;
+}
+
+.card-chevron {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.collapsible-card .card-header-toggle:hover .card-chevron {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.card-chevron svg {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.collapsible-card.card-collapsed .card-chevron svg {
+  transform: rotate(-90deg);
+}
+
+.collapsible-card.card-collapsed .settings-grid,
+.collapsible-card.card-collapsed .tabs,
+.collapsible-card.card-collapsed .tab-content,
+.collapsible-card.card-collapsed .button-group,
+.collapsible-card.card-collapsed .helper-text,
+.collapsible-card.card-collapsed .filter-summary,
+.collapsible-card.card-collapsed .progress-container,
+.collapsible-card.card-collapsed .card-content {
+  display: none !important;
+}
+
+.collapsible-card.card-collapsed {
+  padding-bottom: 1.25rem;
+}
+
+/* ── RESULTS TABLE SCREEN-FIT ENHANCEMENTS ── */
+#resultsTable th, #resultsTable td {
+  padding: 8px 10px;
+}
+
+#resultsTable td.text-wrap-truncate {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+#resultsTable td.text-wrap-vendor {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+#resultsTable td.text-wrap-time {
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+@media (max-width: 1360px) {
+  /* Dynamic column hiding to guarantee perfect FIT on standard displays without lateral scroll */
+  #resultsTable th:nth-child(5), #resultsTable td.text-wrap-time,   /* End Time */
+  #resultsTable th:nth-child(7), #resultsTable td:nth-child(7) {     /* Target Host IP */
+    display: none !important;
+  }
+}
+
+/* ── AUTHENTICATION LAYOUT SYSTEMS ── */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: authFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+}
+
+.auth-header {
+  text-align: center;
+}
+
+.auth-logo {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  box-shadow: 0 0 15px var(--cyan-dim);
+}
+
+.auth-logo svg {
+  stroke: #ffffff !important;
+}
+
+.auth-header h2 {
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.auth-header p {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.auth-tab-btn.active {
+  background: var(--surface2);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.auth-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-form-group label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+.auth-input-wrap input {
+  width: 100%;
+  height: 42px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0 14px;
+  font-size: 13.5px;
+  transition: all 0.2s;
+}
+
+.auth-input-wrap input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-dim);
+}
+
+.auth-btn {
+  width: 100%;
+  height: 42px;
+  background: var(--cyan);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+.auth-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+/* ── ANALYST SECTIONS INSIDE SIDEBAR ── */
+.analyst-profile-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analyst-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.analyst-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+
+.analyst-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.analyst-name {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.analyst-role {
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+  text-transform: uppercase;
+}
+
+.logout-btn:hover {
+  border-color: var(--red);
+  color: #ffffff;
+  background: var(--red-dim);
+}
+
+.section-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 15px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+  user-select: none;
+}
+</style>
+</head>
+<body>
+
+<!-- AUTHENTICATION CONTAINER -->
+<div id="authContainer" class="auth-container" style="display:none">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none" stroke-width="2.2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <h2>Reputation Hub Portal</h2>
+      <p>Security Operations Center Access</p>
+    </div>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" id="authTabBtnSignin" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab-btn" id="authTabBtnRegister" onclick="switchAuthTab('register')">Register</button>
+    </div>
+
+    <div id="authError" style="display:none; color:var(--red); background:var(--red-dim); padding:10px; border-radius:6px; font-size:12px; font-family:'JetBrains Mono',monospace; border:1.5px dashed var(--red); text-align:center;"></div>
+
+    <!-- SIGN IN FORM -->
+    <form id="authFormSignin" onsubmit="signInAnalyst(event)" style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div class="auth-form-group">
+        <label for="signinUsername">Name</label>
+        <div class="auth-input-wrap">
+          <input type="text" id="signinUsername" placeholder="e.g. Chief Analyst" required autocomplete="username">
+        </div>
+      </div>
+      <div class="auth-form-group">
+        <label for="signinPassword">Password</label>
+        <div class="auth-input-wrap">
+          <input type="password" id="signinPassword" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+      </div>
+      <button type="submit" class="auth-btn">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Sign In to Hub
+      </button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="authFormRegister" onsubmit="registerAnalyst(event)" style="display:none; flex-direction:column; gap:1.25rem;">
+      <div class="auth-form-group">
+        <label for="registerName">Name</label>
+        <div class="auth-input-wrap">
+          <input type="text" id="registerName" placeholder="e.g. Inspector John" required autocomplete="name">
+        </div>
+      </div>
+      <div class="auth-form-group">
+        <label for="registerPassword">Password</label>
+        <div class="auth-input-wrap">
+          <input type="password" id="registerPassword" placeholder="Min. 4 characters" required autocomplete="new-password">
+        </div>
+      </div>
+      <div class="auth-form-group">
+        <label for="registerApiKey">VirusTotal API Key (Optional)</label>
+        <div class="auth-input-wrap">
+          <input type="password" id="registerApiKey" placeholder="Paste custom key format">
+        </div>
+        <p style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;line-height:1.4;">Leave blank to use embedded default key.</p>
+      </div>
+      <button type="submit" class="auth-btn">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
+        Register Account
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="mainAppContainer" style="display:none">
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" width="22" height="22" stroke="#0a0c17" fill="none" stroke-width="2.2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="hdr-title">
+      <h1>IP Reputation Scanner</h1>
+      <p>ArcSight Filter · VirusTotal v3</p>
+    </div>
+  </div>
+  <div class="hdr-actions">
+    <button class="icon-btn api-key-btn" id="apiKeyBtn" onclick="openApiKeyModal()" title="Change API Key">
+      <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><circle cx="8" cy="15" r="4"/><line x1="11" y1="12" x2="21" y2="2"/><line x1="19" y1="4" x2="21" y2="6"/><line x1="15" y1="6" x2="17" y2="8"/></svg>
+      API Key
+    </button>
+    <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+      <svg id="themeIcon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- DASHBOARD GRID -->
+<div class="dashboard-grid">
+  
+  <!-- LEFT COLUMN: Settings & Input Data -->
+  <!-- LEFT COLUMN: Consolidated Reputation Engine Panel -->
+  <div class="side-left">
+    
+    <!-- UNIFIED SIDEBAR CARD -->
+    <div class="card collapsible-card" id="unifiedLeftPanel" data-tooltip="Reputation Control Station" onclick="handleSideCardClick('unifiedLeftPanel', event)">
+      
+      <!-- Collapsed Vertical Rail (ChatGPT style, matching Reference Image) -->
+      <div class="collapsed-view-content">
+        <div class="collapsed-top-icons">
+          <div class="collapsed-icon-btn glow-cyan" title="IP Scanner Console" onclick="toggleSidebarEvent(event)">
+            <!-- ChatGPT style swirl geometric SVG -->
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="openai-swirl">
+              <path d="M12 3a6 6 0 0 0-6 6v3a6 6 0 0 0 6 6h1a6 6 0 0 0 6-6V9a6 6 0 0 0-6-6z" />
+              <path d="M12 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
+              <circle cx="12" cy="12" r="6" stroke-dasharray="2 2" />
+            </svg>
+          </div>
+          <div class="collapsed-icon-btn" title="Compose/Upload Logs" onclick="toggleSidebarEvent(event)">
+            <!-- Compose edit symbol -->
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </div>
+          <div class="collapsed-icon-btn" title="Search Reputation" onclick="toggleSidebarEvent(event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <div class="collapsed-icon-btn" title="Triage Comments" onclick="toggleSidebarEvent(event)">
+            <svg viewBox="0 0 24 24" width="19" height="19" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+        </div>
+        
+        <div class="collapsed-bottom-icons">
+          <div class="collapsed-avatar-circle" id="collapsedUserAvatar" title="User Profile" onclick="toggleSidebarEvent(event)">
+            AN
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel Header with Inner Master Collapse Button -->
+      <div class="card-header-toggle" onclick="toggleCard('unifiedLeftPanel', event)">
+        <div class="label" style="margin-bottom:0; width:auto; border:none; display:flex; align-items:center; gap:10px;">
+          <span class="header-icon-wrap" id="unifiedSidebarIcon">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2" class="header-icon-svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="9" y1="9" x2="15" y2="9"/>
+              <line x1="9" y1="13" x2="15" y2="13"/>
+              <line x1="9" y1="17" x2="15" y2="17"/>
+            </svg>
+          </span>
+          <span class="card-header-title">Control Station</span>
+        </div>
+        <div class="header-right-meta" style="display: flex; align-items: center; gap: 8px;">
+          <div id="sidebarUserStatus" style="font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--cyan); background:var(--cyan-dim); padding:2px 8px; border-radius:4px; font-weight:600;">ACTIVE</div>
+          <button class="card-chevron" id="unifiedSidebarCollapseBtn" onclick="toggleSidebarEvent(event)" title="Collapse Panel">
+            <svg id="collapseDoubleChevron" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2.5" style="transition: transform 0.3s ease; transform: rotate(0deg);"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel Content -->
+      <div class="card-content" style="margin-top: 1.25rem;">
+        
+        <!-- SECTION 1: ANALYST PROFILE -->
+        <div class="analyst-profile-section">
+          <div class="analyst-meta">
+            <div class="analyst-avatar" id="analystInitials">AN</div>
+            <div class="analyst-info">
+              <span class="analyst-name" id="analystDisplayName">SecOps Analyst</span>
+              <span class="analyst-role" id="analystUsername">@analyst</span>
+            </div>
+          </div>
+          <div style="font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:5px; margin-top:2px;">
+            <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--green);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="analystKeyStatus">Profile VT Key Active</span>
+          </div>
+          <button class="logout-btn" onclick="signOutAnalyst()" style="margin-top:6px;">🔓 Sign Out</button>
+        </div>
+
+        <!-- SECTION 2: TRIAGE FILTERS ACCORDION -->
+        <div class="section-subtitle" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="toggleSubsection('filtersSubsection', 'filtersSubChevron')">
+          <span style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--cyan);"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Triage & Triage Filters
+          </span>
+          <svg id="filtersSubChevron" viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2.5" style="transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        
+        <div id="filtersSubsection" style="margin-bottom: 20px;">
+          <div class="settings-grid">
+            <div class="setting-group">
+              <div class="label" style="font-size: 11px;">🎯 Flag Threshold</div>
+              <div class="threshold-container">
+                <span style="font-size:12px;color:var(--muted)">≥</span>
+                <div class="threshold-stepper">
+                  <button class="step-btn" onclick="stepThreshold(-1)" title="Decrease">−</button>
+                  <div class="threshold-display" id="thresholdValue">3%</div>
+                  <button class="step-btn" onclick="stepThreshold(1)" title="Increase">+</button>
+                </div>
+                <input type="range" id="thresholdSlider" min="0" max="100" value="3" oninput="updateThreshold(this.value)" style="flex:1">
+              </div>
+            </div>
+            <div class="setting-group" style="margin-top: 10px;">
+              <div class="label" style="font-size: 11px;">🔧 Device Vendors (Keep Only)</div>
+              <div id="vendorTags" class="tag-list"></div>
+              <div class="add-input">
+                <input type="text" id="newVendor" placeholder="e.g., Palo Alto" onkeypress="if(event.key==='Enter') addVendor()">
+                <button onclick="addVendor()">+ Add</button>
+              </div>
+            </div>
+            <div class="setting-group" style="margin-top: 10px;">
+              <div class="label" style="font-size: 11px;">🚫 Excluded IP Ranges</div>
+              <div id="excludeTags" class="tag-list"></div>
+              <div class="add-input">
+                <input type="text" id="newExclude" placeholder="e.g., 192.168" onkeypress="if(event.key==='Enter') addExclude()">
+                <button onclick="addExclude()">+ Add</button>
+              </div>
+              <p style="font-size:10px;color:var(--muted);margin-top:8px;font-family:'JetBrains Mono',monospace">IPs starting with these octets are excluded</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: SCAN INPUTS & TRIGGER -->
+        <div class="label" style="display: flex; align-items: center; gap: 8px; color: #00f0ff; font-weight: 700; border-bottom: 1px dashed rgba(0, 240, 255, 0.25); padding-bottom: 6px; margin-bottom: 1.25rem;">
+          📂 INPUT DATA
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" id="tabBtnFile" onclick="switchTab('file')">📁 Upload File</button>
+          <button class="tab-btn" id="tabBtnPaste" onclick="switchTab('paste')">📝 Paste CSV</button>
+          <button class="tab-btn" id="tabBtnIPs" onclick="switchTab('iplist')">🌐 Paste IPs</button>
+        </div>
+
+        <div id="fileTab" class="tab-content active">
+          <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--cyan)" fill="none" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+            </div>
+            <p>Click or drag & drop CSV or Excel file here</p>
+            <small>Supports .csv, .xlsx, .xls spreadsheets</small>
+          </div>
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFileUpload(this.files[0])"/>
+        </div>
+
+        <div id="pasteTab" class="tab-content">
+          <textarea id="pasteData" rows="6" placeholder="Paste CSV data here...&#10;&#10;End Time,Name,Attacker Address,Target Address,Attacker Geo Country Name,Device Vendor,..."></textarea>
+          <div class="button-group" style="margin-top: 8px;"><button onclick="processPastedData()" style="width: 100%;">📊 Process CSV Data</button></div>
+        </div>
+
+        <div id="iplistTab" class="tab-content">
+          <textarea id="ipListInput" class="ip-list-input" rows="6" placeholder="Enter IP address list (one per line)&#10;&#10;Example:&#10;8.8.8.8&#10;1.1.1.1&#10;185.244.8.21"></textarea>
+          <div class="button-group" style="margin-top: 8px;">
+            <button class="primary" onclick="processIPList()" style="flex:1">🔍 Load IPs</button>
+            <button onclick="clearIPList()">🗑️ Clear</button>
+          </div>
+        </div>
+
+        <!-- Filter Summary -->
+        <div id="filterSummary" class="filter-summary" style="display:none">
+          <strong style="font-size:11px">📋 Active Filters:</strong>
+          <ul id="filterList" style="font-size: 11px;"></ul>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">Ready to scan</div>
+          <div class="progress-meta" id="progressMeta"></div>
+          <!-- Rate limit notice -->
+          <div class="rate-limit-notice" id="rateLimitNotice">
+            <div class="rate-limit-dot"></div>
+            <span id="rateLimitMsg">Rate limited — auto-retrying in <span id="rateLimitCountdown">15</span>s...</span>
+          </div>
+        </div>
+
+        <!-- Consolidated Action Buttons -->
+        <div class="button-group" style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button class="primary" id="scanBtn" onclick="startScan()" disabled style="grid-column: span 2; height: 38px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Start Scan
+          </button>
+          <button class="stop-btn" id="stopBtn" onclick="stopScan()" style="height: 34px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            Stop
+          </button>
+          <button class="danger" onclick="clearAll()" style="height: 34px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Clear
+          </button>
+        </div>
+        
+        <div class="button-group" style="margin-top: 8px; display: flex; gap: 8px;">
+          <button id="exportExcelBtn" onclick="exportToExcel()" disabled style="flex:1; height: 34px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+            Excel
+          </button>
+          <button id="exportCsvBtn" onclick="exportToCSV()" disabled style="flex:1; height: 34px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            CSV
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN: Results & Analytics -->
+  <div class="side-right">
+    
+    <!-- Stats Card / Executive Summary -->
+    <div class="card stats" id="statsPanel" style="display:none">
+      <div class="label" style="width: 100%; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px;">
+        <span class="header-icon-wrap" style="width: 24px; height: 24px; border-radius: 4px;">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+        </span>
+        Executive Summary
+      </div>
+      <div class="stat-card stat-total"><div class="stat-value" id="totalIPs">0</div><div class="stat-label">Total IPs</div></div>
+      <div class="stat-card stat-malicious"><div class="stat-value" id="maliciousCount">0</div><div class="stat-label">Malicious</div></div>
+      <div class="stat-card stat-suspicious"><div class="stat-value" id="suspiciousCount">0</div><div class="stat-label">Suspicious</div></div>
+      <div class="stat-card stat-clean"><div class="stat-value" id="cleanCount">0</div><div class="stat-label">Clean</div></div>
+    </div>
+
+    <!-- CHARTS CARD (With Collapsible/Toggle View) -->
+    <div class="card" id="chartsCard" style="display:none">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+        <div class="label" style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+          <span class="header-icon-wrap" style="width: 24px; height: 24px; border-radius: 4px;">
+            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </span>
+          Detection Analytics
+        </div>
+        <button class="filter-btn" id="analyticsToggleBtn" onclick="toggleAnalytics()" style="font-size: 11px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 5px;">
+          <span id="analyticsToggleText">Hide Panel</span>
+        </button>
+      </div>
+      <div class="charts-grid" id="chartsGrid">
+        <div class="chart-box">
+          <div class="chart-box-title" style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--cyan);"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            Detection Breakdown
+          </div>
+          <div class="chart-canvas-wrap"><canvas id="pieChart"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-box-title" style="display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" fill="none" stroke-width="2" style="color:var(--cyan);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Top Countries
+          </div>
+          <div class="chart-canvas-wrap"><canvas id="barChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS CARD -->
+    <div class="card" id="resultsCard" style="display:none">
+      <div class="label" style="display: flex; align-items: center; gap: 8px;">
+        <span class="header-icon-wrap" style="width: 24px; height: 24px; border-radius: 4px;">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+        </span>
+        Scan Results
+      </div>
+      <div class="results-controls">
+        <div class="filter-btns">
+          <button class="filter-btn active-all" id="fbAll" onclick="setTableFilter('all')">🔵 All</button>
+          <button class="filter-btn" id="fbMalicious" onclick="setTableFilter('malicious')">🔴 Malicious</button>
+          <button class="filter-btn" id="fbSuspicious" onclick="setTableFilter('suspicious')">🟡 Suspicious</button>
+          <button class="filter-btn" id="fbClean" onclick="setTableFilter('clean')">🟢 Clean</button>
+          
+          <!-- New VT % filter beside categories -->
+          <span style="font-size: 11px; color: var(--text2); font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-left: 8px;">🛡️ VT % Filter:</span>
+          <select id="vtPctSelectFilter" onchange="renderTable()">
+            <option value="all">Any VT %</option>
+            <option value="gt0">Detection &gt; 0%</option>
+            <option value="gt5">Detection &gt; 5%</option>
+            <option value="gt15">Detection &gt; 15%</option>
+            <option value="gt30">Detection &gt; 30%</option>
+            <option value="gt50">Detection &gt; 50%</option>
+          </select>
+        </div>
+        <button class="filter-btn" id="tableResizeBtn" onclick="toggleTableExpand()" style="margin-left: 10px; gap: 5px;">
+          <span id="expandIcon">↕</span> <span id="expandText">Expand Height</span>
+        </button>
+        <div class="ip-search-wrap">
+          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="ip-search-input" id="ipSearchInput" type="text" placeholder="Search IP..." oninput="renderTable()">
+        </div>
+      </div>
+      <div class="table-container">
+        <table id="resultsTable">
+          <thead id="tableHeader"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /dashboard-grid -->
+
+</div><!-- /wrap -->
+</div><!-- /mainAppContainer -->
+
+<!-- IP DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-ip">
+      <span id="modalIP">—</span>
+      <button class="modal-copy-btn" onclick="copyText(document.getElementById('modalIP').textContent)">📋 Copy</button>
+    </div>
+    <div class="modal-country" id="modalCountry">—</div>
+    <div class="modal-stats" id="modalStats"></div>
+    <div class="detection-bar" id="detectionBar" style="display:none">
+      <div class="detection-bar-label"><span>Detection Rate</span><span id="detectionPct">—</span></div>
+      <div class="detection-bar-track"><div class="detection-bar-fill" id="detectionFill" style="width:0%"></div></div>
+    </div>
+    <div class="vendor-section" id="vendorSection" style="display:none">
+      <div class="vendor-section-title">🔴 Detected by</div>
+      <div class="vendor-list" id="vendorList"></div>
+    </div>
+    <div class="vendor-section" id="suspVendorSection" style="display:none">
+      <div class="vendor-section-title">⚠️ Flagged suspicious by</div>
+      <div class="vendor-list" id="suspVendorList"></div>
+    </div>
+    <a class="modal-vt-link" id="modalVTLink" href="#" target="_blank" rel="noopener">🔗 View Full Report on VirusTotal ↗</a>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apikeyOverlay" onclick="closeApiKeyModal(event)">
+  <div class="apikey-modal">
+    <button class="modal-close" onclick="closeApiKeyModalDirect()">✕</button>
+    <div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:6px">🔑 VirusTotal API Key</div>
+    <div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">Enter your VT API key. It's saved in your browser only.</div>
+    <input class="apikey-input" id="apikeyInput" type="password" placeholder="Paste API key here..." autocomplete="off">
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="primary" onclick="saveApiKey()" style="flex:1">💾 Save Key</button>
+      <button onclick="toggleApiKeyVisible()" id="apikeyToggle">👁 Show</button>
+    </div>
+    <div class="apikey-status" id="apikeyStatus"></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:12px;font-family:'JetBrains Mono',monospace;line-height:1.6">
+      The key stored here overrides the server-side key in scan.js.<br>
+      Leave blank to use the default embedded key.
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+let SUSPICIOUS_THRESHOLD = 3;
+let filteredData = [];
+let vtResults = new Map();
+let isScanning = false;
+let shouldStop = false;
+let rawData = [];
+// DEFAULT tab is file (Upload CSV)
+let currentInputType = 'file';
+let allowedVendors = new Set(['Apache', 'Firewall', 'ISE', 'Cisco']);
+let excludedIPs = new Set(['10', '172', '192', '127']);
+let tableFilter = 'all'; // all | malicious | suspicious | clean
+let pieChartInst = null;
+let barChartInst = null;
+
+// Full country ISO-to-Name Mapping Dictionary
+const countryNames = {
+  "AD": "Andorra", "AE": "United Arab Emirates", "AF": "Afghanistan", "AG": "Antigua & Barbuda", "AI": "Anguilla", "AL": "Albania", "AM": "Armenia", "AO": "Angola", "AQ": "Antarctica", "AR": "Argentina", "AS": "American Samoa", "AT": "Austria", "AU": "Australia", "AW": "Aruba", "AX": "Åland Islands", "AZ": "Azerbaijan",
+  "BA": "Bosnia & Herzegovina", "BB": "Barbados", "BD": "Bangladesh", "BE": "Belgium", "BF": "Burkina Faso", "BG": "Bulgaria", "BH": "Bahrain", "BI": "Burundi", "BJ": "Benin", "BL": "Saint Barthélemy", "BM": "Bermuda", "BN": "Brunei", "BO": "Bolivia", "BQ": "Caribbean Netherlands", "BR": "Brazil", "BS": "Bahamas", "BT": "Bhutan", "BV": "Bouvet Island", "BW": "Botswana", "BY": "Belarus", "BZ": "Belize",
+  "CA": "Canada", "CC": "Cocos (Keeling) Islands", "CD": "Congo (DRC)", "CF": "Central African Republic", "CG": "Congo (Republic)", "CH": "Switzerland", "CI": "Côte d’Ivoire", "CK": "Cook Islands", "CL": "Chile", "CM": "Cameroon", "CN": "China", "CO": "Colombia", "CR": "Costa Rica", "CU": "Cuba", "CV": "Cabo Verde", "CW": "Curaçao", "CX": "Christmas Island", "CY": "Cyprus", "CZ": "Czechia",
+  "DE": "Germany", "DJ": "Djibouti", "DK": "Denmark", "DM": "Dominica", "DO": "Dominican Republic", "DZ": "Algeria",
+  "EC": "Ecuador", "EE": "Estonia", "EG": "Egypt", "EH": "Western Sahara", "ER": "Eritrea", "ES": "Spain", "ET": "Ethiopia",
+  "FI": "Finland", "FJ": "Fiji", "FK": "Falkland Islands", "FM": "Micronesia", "FO": "Faroe Islands", "FR": "France",
+  "GA": "Gabon", "GB": "United Kingdom", "GD": "Grenada", "GE": "Georgia", "GF": "French Guiana", "GG": "Guernsey", "GH": "Ghana", "GI": "Gibraltar", "GL": "Greenland", "GM": "Gambia", "GN": "Guinea", "GP": "Guadeloupe", "GQ": "Equatorial Guinea", "GR": "Greece", "GS": "South Georgia & South Sandwich Islands", "GT": "Guatemala", "GU": "Guam", "GW": "Guinea-Bissau", "GY": "Guyana",
+  "HK": "Hong Kong", "HM": "Heard Island & McDonald Islands", "HN": "Honduras", "HR": "Croatia", "HT": "Haiti", "HU": "Hungary",
+  "ID": "Indonesia", "IE": "Ireland", "IL": "Israel", "IM": "Isle of Man", "IN": "India", "IO": "British Indian Ocean Territory", "IQ": "Iraq", "IR": "Iran", "IS": "Iceland", "IT": "Italy",
+  "JE": "Jersey", "JM": "Jamaica", "JO": "Jordan", "JP": "Japan",
+  "KE": "Kenya", "KG": "Kyrgyzstan", "KH": "Cambodia", "KI": "Kiribati", "KM": "Comoros", "KN": "Saint Kitts & Nevis", "KP": "North Korea", "KR": "South Korea", "KW": "Kuwait", "KY": "Cayman Islands", "KZ": "Kazakhstan",
+  "LA": "Laos", "LB": "Lebanon", "LC": "Saint Lucia", "LI": "Liechtenstein", "LK": "Sri Lanka", "LR": "Liberia", "LS": "Lesotho", "LT": "Lithuania", "LU": "Luxembourg", "LV": "Latvia", "LY": "Libya",
+  "MA": "Morocco", "MC": "Monaco", "MD": "Moldova", "ME": "Montenegro", "MF": "Saint Martin", "MG": "Madagascar", "MH": "Marshall Islands", "MK": "North Macedonia", "ML": "Mali", "MM": "Myanmar", "MN": "Mongolia", "MO": "Macao", "MP": "Northern Mariana Islands", "MQ": "Martinique", "MR": "Mauritania", "MS": "Montserrat", "MT": "Malta", "MU": "Mauritius", "MV": "Maldives", "MW": "Malawi", "MX": "Mexico", "MY": "Malaysia", "MZ": "Mozambique",
+  "NA": "Namibia", "NC": "New Caledonia", "NE": "Niger", "NF": "Norfolk Island", "NG": "Nigeria", "NI": "Nicaragua", "NL": "Netherlands", "NO": "Norway", "NP": "Nepal", "NR": "Nauru", "NU": "Niue", "NZ": "New Zealand",
+  "OM": "Oman",
+  "PA": "Panama", "PE": "Peru", "PF": "French Polynesia", "PG": "Papua New Guinea", "PH": "Philippines", "PK": "Pakistan", "PL": "Poland", "PM": "Saint Pierre & Miquelon", "PN": "Pitcairn", "PR": "Puerto Rico", "PS": "Palestine", "PT": "Portugal", "PW": "Palau", "PY": "Paraguay",
+  "QA": "Qatar",
+  "RE": "Réunion", "RO": "Romania", "RS": "Serbia", "RU": "Russia", "RW": "Rwanda",
+  "SA": "Saudi Arabia", "SB": "Solomon Islands", "SC": "Seychelles", "SD": "Sudan", "SE": "Sweden", "SG": "Singapore", "SH": "Saint Helena", "SI": "Slovenia", "SJ": "Svalbard & Jan Mayen", "SK": "Slovakia", "SL": "Sierra Leone", "SM": "San Marino", "SN": "Senegal", "SO": "Somalia", "SR": "Suriname", "SS": "South Sudan", "ST": "São Tomé & Príncipe", "SV": "El Salvador", "SX": "Sint Maarten", "SY": "Syria", "SZ": "Eswatini",
+  "TC": "Turks & Caicos Islands", "TD": "Chad", "TF": "French Southern Territories", "TG": "Togo", "TH": "Thailand", "TJ": "Tajikistan", "TK": "Tokelau", "TL": "Timor-Leste", "TM": "Turkmenistan", "TN": "Tunisia", "TO": "Tonga", "TR": "Turkey", "TT": "Trinidad & Tobago", "TV": "Tuvalu", "TW": "Taiwan", "TZ": "Tanzania",
+  "UA": "Ukraine", "UG": "Uganda", "UM": "U.S. Outlying Islands", "US": "United States", "UY": "Uruguay", "UZ": "Uzbekistan",
+  "VA": "Vatican City", "VC": "Saint Vincent & Grenadines", "VE": "Venezuela", "VG": "British Virgin Islands", "VI": "U.S. Virgin Islands", "VN": "Vietnam", "VU": "Vanuatu",
+  "WF": "Wallis & Futuna", "WS": "Samoa",
+  "YE": "Yemen", "YT": "Mayotte",
+  "ZA": "South Africa", "ZM": "Zambia", "ZW": "Zimbabwe"
+};
+
+function getFullCountryName(code) {
+  if (!code || code === '—') return '—';
+  const clean = code.trim().toUpperCase();
+  return countryNames[clean] || code;
+}
+
+// ── CACHE ──────────────────────────────────────────────────────
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function getCached(ip) {
+  try {
+    const raw = localStorage.getItem('vtcache:' + ip);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL_MS) { localStorage.removeItem('vtcache:' + ip); return null; }
+    return data;
+  } catch { return null; }
+}
+function setCache(ip, data) {
+  try { localStorage.setItem('vtcache:' + ip, JSON.stringify({ data, ts: Date.now() })); } catch {}
+}
+
+// ── API KEY ────────────────────────────────────────────────────
+function getApiKey() {
+  if (currentUser && currentUser.apiKey) {
+    return currentUser.apiKey.trim();
+  }
+  return localStorage.getItem('vt_api_key') || '';
+}
+
+function openApiKeyModal() {
+  const input = document.getElementById('apikeyInput');
+  input.value = getApiKey();
+  document.getElementById('apikeyStatus').textContent = '';
+  document.getElementById('apikeyOverlay').classList.add('open');
+}
+function closeApiKeyModal(e) { if (e.target === document.getElementById('apikeyOverlay')) closeApiKeyModalDirect(); }
+function closeApiKeyModalDirect() { document.getElementById('apikeyOverlay').classList.remove('open'); }
+function toggleApiKeyVisible() {
+  const inp = document.getElementById('apikeyInput');
+  const btn = document.getElementById('apikeyToggle');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈 Hide'; }
+  else { inp.type = 'password'; btn.textContent = '👁 Show'; }
+}
+function saveApiKey() {
+  const val = document.getElementById('apikeyInput').value.trim();
+  const st = document.getElementById('apikeyStatus');
+  if (val && val.length < 20) { st.textContent = '⚠ Key looks too short'; st.className = 'apikey-status err'; return; }
+  if (val) {
+    localStorage.setItem('vt_api_key', val);
+    if (currentUser) {
+      currentUser.apiKey = val;
+      localStorage.setItem('current_analyst_user', JSON.stringify(currentUser));
+      let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
+      if (users[currentUser.username]) {
+        users[currentUser.username].apiKey = val;
+        localStorage.setItem('analyst_users', JSON.stringify(users));
+      }
+      const lsWrap = document.getElementById('analystKeyStatus');
+      if (lsWrap) {
+        lsWrap.textContent = 'Profile Key: ' + val.slice(0, 4) + '...' + val.slice(-4);
+        lsWrap.style.color = 'var(--green)';
+      }
+    }
+    st.textContent = '✓ Key saved successfully';
+    st.className = 'apikey-status ok';
+  } else {
+    localStorage.removeItem('vt_api_key');
+    if (currentUser) {
+      currentUser.apiKey = '';
+      localStorage.setItem('current_analyst_user', JSON.stringify(currentUser));
+      let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
+      if (users[currentUser.username]) {
+        users[currentUser.username].apiKey = '';
+        localStorage.setItem('analyst_users', JSON.stringify(users));
+      }
+      const lsWrap = document.getElementById('analystKeyStatus');
+      if (lsWrap) {
+        lsWrap.textContent = 'Using system default key';
+        lsWrap.style.color = 'var(--muted)';
+      }
+    }
+    st.textContent = '✓ Cleared — using embedded default key';
+    st.className = 'apikey-status ok';
+  }
+  setTimeout(closeApiKeyModalDirect, 1200);
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+function loadSettings() {
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+  
+  // If we have a logged-in user, load settings from their profile
+  if (currentUser) {
+    if (currentUser.threshold !== undefined) SUSPICIOUS_THRESHOLD = currentUser.threshold;
+    if (currentUser.allowedVendors) allowedVendors = new Set(currentUser.allowedVendors);
+    if (currentUser.excludedIPs) excludedIPs = new Set(currentUser.excludedIPs);
+  } else {
+    const savedThresh = localStorage.getItem('threshold');
+    if (savedThresh) SUSPICIOUS_THRESHOLD = parseInt(savedThresh);
+    const savedVendors = localStorage.getItem('allowedVendors');
+    if (savedVendors) allowedVendors = new Set(JSON.parse(savedVendors));
+    const savedExcludes = localStorage.getItem('excludedIPs');
+    if (savedExcludes) excludedIPs = new Set(JSON.parse(savedExcludes));
+  }
+  
+  document.getElementById('thresholdSlider').value = SUSPICIOUS_THRESHOLD;
+  document.getElementById('thresholdValue').textContent = SUSPICIOUS_THRESHOLD + '%';
+  renderVendorTags(); renderExcludeTags();
+
+  // Restore sidebar master collapsed state
+  const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+  if (isSidebarCollapsed) {
+    toggleSidebar(true);
+  }
+  const isUnifiedCollapsed = localStorage.getItem('unifiedLeftPanelCollapsed') === 'true';
+  if (isUnifiedCollapsed) {
+    const card = document.getElementById('unifiedLeftPanel');
+    if (card) card.classList.add('card-collapsed');
+  }
+}
+function saveSettings() {
+  if (currentUser) {
+    currentUser.threshold = SUSPICIOUS_THRESHOLD;
+    currentUser.allowedVendors = [...allowedVendors];
+    currentUser.excludedIPs = [...excludedIPs];
+    localStorage.setItem('current_analyst_user', JSON.stringify(currentUser));
+    
+    let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
+    if (users[currentUser.username]) {
+      users[currentUser.username].threshold = SUSPICIOUS_THRESHOLD;
+      users[currentUser.username].allowedVendors = [...allowedVendors];
+      users[currentUser.username].excludedIPs = [...excludedIPs];
+      localStorage.setItem('analyst_users', JSON.stringify(users));
+    }
+  }
+  localStorage.setItem('threshold', SUSPICIOUS_THRESHOLD);
+  localStorage.setItem('allowedVendors', JSON.stringify([...allowedVendors]));
+  localStorage.setItem('excludedIPs', JSON.stringify([...excludedIPs]));
+}
+function stepThreshold(delta) {
+  const newVal = Math.max(0, Math.min(100, SUSPICIOUS_THRESHOLD + delta));
+  document.getElementById('thresholdSlider').value = newVal;
+  updateThreshold(newVal);
+}
+function updateThreshold(val) {
+  SUSPICIOUS_THRESHOLD = parseInt(val);
+  document.getElementById('thresholdValue').textContent = SUSPICIOUS_THRESHOLD + '%';
+  document.getElementById('thresholdSlider').value = SUSPICIOUS_THRESHOLD;
+  saveSettings();
+  if (vtResults.size > 0) { updateStatsAndTable(); updateCharts(); }
+}
+
+function renderVendorTags() {
+  const c = document.getElementById('vendorTags'); c.innerHTML = '';
+  for (const v of allowedVendors) {
+    const t = document.createElement('span'); t.className = 'tag';
+    t.innerHTML = `${v} <span class="tag-remove" onclick="removeVendor('${v.replace(/'/g,"\\'")}')">×</span>`;
+    c.appendChild(t);
+  }
+}
+function addVendor() {
+  const i = document.getElementById('newVendor'); const v = i.value.trim();
+  if (v && !allowedVendors.has(v)) { allowedVendors.add(v); renderVendorTags(); saveSettings(); i.value = ''; }
+}
+function removeVendor(v) { allowedVendors.delete(v); renderVendorTags(); saveSettings(); }
+
+function renderExcludeTags() {
+  const c = document.getElementById('excludeTags'); c.innerHTML = '';
+  for (const e of excludedIPs) {
+    const t = document.createElement('span'); t.className = 'tag';
+    t.innerHTML = `${e}.x.x <span class="tag-remove" onclick="removeExclude('${e.replace(/'/g,"\\'")}')">×</span>`;
+    c.appendChild(t);
+  }
+}
+function addExclude() {
+  const i = document.getElementById('newExclude'); const v = i.value.trim();
+  if (v && !excludedIPs.has(v)) { excludedIPs.add(v); renderExcludeTags(); saveSettings(); i.value = ''; }
+}
+function removeExclude(ip) { excludedIPs.delete(ip); renderExcludeTags(); saveSettings(); }
+
+// ── THEME ──────────────────────────────────────────────────────
+function toggleTheme() {
+  const c = document.documentElement.getAttribute('data-theme');
+  const n = c === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', n);
+  localStorage.setItem('theme', n);
+  updateThemeIcon(n);
+  if (vtResults.size > 0) setTimeout(updateCharts, 50);
+}
+
+function updateThemeIcon(theme) {
+  const btn = document.getElementById('themeBtn');
+  if (!btn) return;
+  if (theme === 'dark') {
+    btn.innerHTML = `
+      <svg id="themeIcon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    `;
+    btn.title = "Switch to Light Mode";
+  } else {
+    btn.innerHTML = `
+      <svg id="themeIcon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    `;
+    btn.title = "Switch to Dark Mode";
+  }
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg, type = '') {
+  const e = document.getElementById('toast');
+  e.textContent = msg; e.className = 'toast show ' + type;
+  clearTimeout(e._t); e._t = setTimeout(() => e.classList.remove('show'), 3200);
+}
+
+// ── COPY TO CLIPBOARD ─────────────────────────────────────────
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => toast('📋 Copied: ' + text, 'toast-success')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('📋 Copied: ' + text, 'toast-success');
+  });
+}
+
+// ── TOGGLE VIEW: DETECTION ANALYTICS ──
+function toggleAnalytics() {
+  const grid = document.getElementById('chartsGrid');
+  const btnText = document.getElementById('analyticsToggleText');
+  if (grid.style.display === 'none') {
+    grid.style.display = 'grid';
+    btnText.textContent = 'Hide Panel';
+    setTimeout(updateCharts, 50);
+  } else {
+    grid.style.display = 'none';
+    btnText.textContent = 'Show Panel';
+  }
+}
+
+// ── TABLE HEIGHT RESIZING (EXPAND / COLLAPSE) ──
+function toggleTableExpand() {
+  const container = document.querySelector('.table-container');
+  const expandText = document.getElementById('expandText');
+  const expandIcon = document.getElementById('expandIcon');
+  if (container.classList.contains('expanded')) {
+    container.classList.remove('expanded');
+    expandText.textContent = 'Expand Height';
+    expandIcon.textContent = '↕';
+  } else {
+    container.classList.add('expanded');
+    expandText.textContent = 'Collapse Height';
+    expandIcon.textContent = '↔';
+  }
+}
+
+// ── TABLE FILTER BUTTONS ──────────────────────────────────────
+function setTableFilter(f) {
+  tableFilter = f;
+  ['all','malicious','suspicious','clean'].forEach(k => {
+    const btn = document.getElementById('fb' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (btn) btn.className = 'filter-btn' + (k === f ? ' active-' + k : '');
+  });
+  renderTable();
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function isLocalIP(ip) {
+  if (!ip) return true;
+  const parts = ip.split('.');
+  const a = parseInt(parts[0]), b = parseInt(parts[1]);
+  if (a === 10) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 192 && b === 168) return true;
+  if (a === 127) return true;
+  if (a === 169 && b === 254) return true;
+  for (const exc of excludedIPs) { if (ip.startsWith(exc + '.') || ip === exc) return true; }
+  return false;
+}
+function getDateOnly(d) {
+  if (!d) return null;
+  const m = d.match(/(\w+ \d+, \d{4})/);
+  return m ? m[1] : null;
+}
+
+// ── CSV PARSING ────────────────────────────────────────────────
+function parseCSVText(text) {
+  const result = Papa.parse(text.trim(), { header: true, skipEmptyLines: true, dynamicTyping: false });
+  return result.data || [];
+}
+
+// ── TAB SWITCHING ──────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tabBtnFile').classList.remove('active');
+  document.getElementById('tabBtnPaste').classList.remove('active');
+  document.getElementById('tabBtnIPs').classList.remove('active');
+
+  document.getElementById('fileTab').classList.remove('active');
+  document.getElementById('pasteTab').classList.remove('active');
+  document.getElementById('iplistTab').classList.remove('active');
+
+  if (tab === 'file') {
+    document.getElementById('tabBtnFile').classList.add('active');
+    document.getElementById('fileTab').classList.add('active');
+  } else if (tab === 'paste') {
+    document.getElementById('tabBtnPaste').classList.add('active');
+    document.getElementById('pasteTab').classList.add('active');
+  } else {
+    document.getElementById('tabBtnIPs').classList.add('active');
+    document.getElementById('iplistTab').classList.add('active');
+  }
+  currentInputType = tab;
+  clearAll();
+}
+
+// ── SIDEBAR MASTER & CARD COLLAPSE SYSTEM ──────────────────────
+function toggleSidebar(forceState) {
+  const grid = document.querySelector('.dashboard-grid');
+  const sidebar = document.querySelector('.side-left');
+  const arrow = document.getElementById('sidebarToggleArrow');
+  const text = document.getElementById('sidebarToggleText');
+  const toggleBtn = document.getElementById('toggleSidebarBtn');
+  
+  if (!grid || !sidebar) return;
+  
+  const isCurrentlyCollapsed = sidebar.classList.contains('collapsed');
+  const toCollapse = (forceState !== undefined) ? forceState : !isCurrentlyCollapsed;
+  
+  if (toCollapse) {
+    grid.classList.add('sidebar-collapsed');
+    sidebar.classList.add('collapsed');
+    
+    if (arrow) {
+      const svg = arrow.querySelector('svg');
+      if (svg) {
+        svg.style.transform = 'rotate(180deg)';
+      } else {
+        arrow.textContent = '➡️';
+      }
+    }
+    if (text) text.textContent = 'Expand';
+    if (toggleBtn) toggleBtn.title = 'Expand Left Sidebar';
+    localStorage.setItem('sidebarCollapsed', 'true');
+  } else {
+    grid.classList.remove('sidebar-collapsed');
+    sidebar.classList.remove('collapsed');
+    
+    if (arrow) {
+      const svg = arrow.querySelector('svg');
+      if (svg) {
+        svg.style.transform = 'rotate(0deg)';
+      } else {
+        arrow.textContent = '⬅️';
+      }
+    }
+    if (text) text.textContent = 'Collapse Panels';
+    if (toggleBtn) toggleBtn.title = 'Collapse Left Sidebar';
+    localStorage.setItem('sidebarCollapsed', 'false');
+  }
+}
+
+function handleSideCardClick(cardId, event) {
+  const sidebar = document.querySelector('.side-left');
+  if (sidebar && sidebar.classList.contains('collapsed')) {
+    // If sidebar is collapsed, clicking anywhere on the card expands it!
+    toggleSidebar(false);
+    event.stopPropagation();
+    return;
+  }
+}
+
+function toggleCard(cardId, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+  
+  const sidebar = document.querySelector('.side-left');
+  if (sidebar && sidebar.classList.contains('collapsed')) {
+    toggleSidebar(false);
+    return;
+  }
+
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  
+  const isCollapsed = card.classList.contains('card-collapsed');
+  if (isCollapsed) {
+    card.classList.remove('card-collapsed');
+    localStorage.setItem(cardId + 'Collapsed', 'false');
+  } else {
+    card.classList.add('card-collapsed');
+    localStorage.setItem(cardId + 'Collapsed', 'true');
+  }
+}
+
+// ── DRAG & DROP ────────────────────────────────────────────────
+function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); document.getElementById('dropZone').classList.add('drag-over'); }
+function handleDragLeave(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault(); e.stopPropagation();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFileUpload(file);
+}
+
+// ── FILE UPLOAD ────────────────────────────────────────────────
+async function handleFileUpload(file) {
+  if (!file) return;
+  const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+  const isCsv = file.name.endsWith('.csv');
+  if (!isExcel && !isCsv) {
+    toast('Please upload a CSV or Excel (.xlsx, .xls) file', 'toast-error');
+    return;
+  }
+  
+  toast(`Loading ${file.name}...`);
+  try {
+    let parsed = [];
+    if (isCsv) {
+      const text = await file.text();
+      parsed = parseCSVText(text);
+    } else {
+      // Excel spreadsheet parser using SheetJS XLSX global
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      parsed = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+    }
+    
+    if (!parsed || parsed.length === 0) {
+      toast('The uploaded file was empty or could not be parsed', 'toast-error');
+      return;
+    }
+    
+    // Normalizing parsed headers (SheetJS reads keys literally, let's normalize headers if needed)
+    // To ensure exact match with ArcSight headers, we don't change keys but just let the filter handle them
+    processData(parsed);
+  } catch (err) {
+    console.error(err);
+    toast('Error reading or parsing file: ' + err.message, 'toast-error');
+  }
+}
+async function processPastedData() {
+  const text = document.getElementById('pasteData').value;
+  if (!text.trim()) { toast('Please paste data', 'toast-error'); return; }
+  const parsed = parseCSVText(text);
+  if (!parsed.length) { toast('No valid data found', 'toast-error'); return; }
+  processData(parsed);
+}
+function processIPList() {
+  const text = document.getElementById('ipListInput').value;
+  if (!text.trim()) { toast('Please enter IP addresses', 'toast-error'); return; }
+  const ips = text.split(/\r?\n/).map(ip => ip.trim()).filter(ip => ip && /^(\d{1,3}\.){3}\d{1,3}$/.test(ip));
+  if (!ips.length) { toast('No valid IP addresses found', 'toast-error'); return; }
+  const uniqueIps = [...new Set(ips)];
+  filteredData = uniqueIps.map(ip => ({ endTime: '', name: 'Manual Entry', attackerAddress: ip, targetAddress: '172.21.21.50', country: '', deviceVendor: 'Manual' }));
+  vtResults.clear(); resetUI();
+  document.getElementById('scanBtn').disabled = false;
+  toast(`Loaded ${filteredData.length} unique IPs — ready to scan`);
+}
+
+function filterData(input) {
+  const filtered = []; const seen = new Set(); const applied = new Set();
+  for (const row of input) {
+    const end = row['End Time'] || '';
+    const mgr = row['Manager Receipt Time'] || '';
+    const ip = row['Attacker Address'] || '';
+    const country = row['Attacker Geo Country Name'] || '';
+    const vendor = row['Device Vendor'] || '';
+    if (country === 'Ethiopia') { applied.add('Removed Ethiopia'); continue; }
+    let ok = false;
+    for (const v of allowedVendors) if (vendor.includes(v)) { ok = true; break; }
+    if (!ok) { applied.add(`Kept only: ${[...allowedVendors].join(', ')}`); continue; }
+    if (isLocalIP(ip)) { applied.add('Removed local/private IPs'); continue; }
+    const endDate = getDateOnly(end), mgrDate = getDateOnly(mgr);
+    if (endDate && mgrDate && endDate !== mgrDate) { applied.add('Kept only matching dates'); continue; }
+    if (seen.has(ip)) { applied.add('Removed duplicate IPs'); continue; }
+    seen.add(ip);
+    filtered.push({ endTime: end, name: row['Name'] || '', attackerAddress: ip, targetAddress: row['Target Address'] || '', country, deviceVendor: vendor });
+  }
+  if (applied.size) {
+    const fl = document.getElementById('filterList');
+    fl.innerHTML = Array.from(applied).map(f => `<li>✓ ${f}</li>`).join('');
+    document.getElementById('filterSummary').style.display = 'block';
+  }
+  return filtered;
+}
+function processData(parsed) {
+  rawData = parsed; filteredData = filterData(rawData);
+  if (!filteredData.length) { toast('No data after filtering', 'toast-error'); return; }
+  vtResults.clear(); resetUI();
+  document.getElementById('scanBtn').disabled = false;
+  toast(`Filtered: ${filteredData.length} unique IPs ready to scan`);
+}
+function resetUI() {
+  document.getElementById('statsPanel').style.display = 'none';
+  document.getElementById('resultsCard').style.display = 'none';
+  document.getElementById('chartsCard').style.display = 'none';
+  document.getElementById('progressContainer').style.display = 'none';
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('exportExcelBtn').disabled = true;
+  document.getElementById('exportCsvBtn').disabled = true;
+  document.getElementById('filterSummary').style.display = 'none';
+  document.getElementById('rateLimitNotice').classList.remove('visible');
+}
+function clearAll() {
+  filteredData = []; vtResults.clear(); isScanning = false; shouldStop = false;
+  resetUI();
+  document.getElementById('stopBtn').style.display = 'none';
+  if (currentInputType === 'iplist') document.getElementById('ipListInput').value = '';
+  else if (currentInputType === 'paste') document.getElementById('pasteData').value = '';
+  toast('Cleared all data');
+}
+function clearIPList() { document.getElementById('ipListInput').value = ''; clearAll(); }
+
+// ── SCAN ───────────────────────────────────────────────────────
+async function checkVTIP(ip) {
+  const cached = getCached(ip);
+  if (cached) return { ...cached, fromCache: true };
+  const customKey = getApiKey();
+  try {
+    const url = customKey
+      ? `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
+      : `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.error) setCache(ip, data);
+    return data;
+  } catch (e) { return { error: e.message }; }
+}
+
+async function startScan() {
+  if (isScanning || !filteredData.length) return;
+  isScanning = true; shouldStop = false;
+  vtResults.clear();
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('stopBtn').style.display = 'inline-flex';
+  document.getElementById('exportExcelBtn').disabled = true;
+  document.getElementById('exportCsvBtn').disabled = true;
+
+  const pc = document.getElementById('progressContainer');
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  const pm = document.getElementById('progressMeta');
+  pc.style.display = 'block';
+
+  const ips = filteredData.map(d => d.attackerAddress);
+  const startTime = Date.now();
+  let cached = 0, errors = 0, rateLimited = 0;
+
+  for (let i = 0; i < ips.length; i++) {
+    if (shouldStop) { pt.textContent = `⛔ Stopped at ${i}/${ips.length}`; break; }
+
+    const ip = ips[i];
+    const pct = Math.round((i / ips.length) * 100);
+    pt.innerHTML = `<span class="scan-status-dot"></span>&nbsp;Scanning ${i + 1}/${ips.length}: ${escapeHtml(ip)}`;
+    pf.style.width = pct + '%';
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(0);
+    const rate = i > 0 ? (i / ((Date.now() - startTime) / 1000)).toFixed(1) : '—';
+    pm.textContent = `${elapsed}s elapsed · ${rate} IPs/s · ${cached} cached · ${errors} errors`;
+
+    let r = await checkVTIP(ip);
+
+    // Auto-retry on rate limit
+    if (r.error === 'RATE_LIMITED') {
+      rateLimited++;
+      const notice = document.getElementById('rateLimitNotice');
+      notice.classList.add('visible');
+      const cdEl = document.getElementById('rateLimitCountdown');
+      let cd = 15;
+      cdEl.textContent = cd;
+      const cdInt = setInterval(() => { cd--; cdEl.textContent = cd; if (cd <= 0) clearInterval(cdInt); }, 1000);
+      await sleep(15000);
+      clearInterval(cdInt);
+      notice.classList.remove('visible');
+      if (!shouldStop) r = await checkVTIP(ip); // retry once
+      if (r.error) errors++;
+    }
+
+    vtResults.set(ip, r);
+    if (r.fromCache) cached++;
+    if (r.error && r.error !== 'RATE_LIMITED') errors++;
+
+    if (i % 5 === 0 || i === ips.length - 1) {
+      updateStatsAndTable();
+      document.getElementById('resultsCard').style.display = 'block';
+      updateCharts();
+    }
+    if (i < ips.length - 1 && !shouldStop && !r.fromCache) await sleep(1250);
+  }
+
+  pf.style.width = '100%';
+  if (!shouldStop) {
+    pt.innerHTML = '✅ Scan complete!';
+    pm.textContent = `${ips.length} IPs · ${cached} cached · ${errors} errors · ${rateLimited} rate limits · ${((Date.now() - startTime) / 1000).toFixed(1)}s total`;
+  }
+
+  updateStatsAndTable();
+  updateCharts();
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('stopBtn').style.display = 'none';
+  document.getElementById('exportExcelBtn').disabled = false;
+  document.getElementById('exportCsvBtn').disabled = false;
+  document.getElementById('rateLimitNotice').classList.remove('visible');
+  isScanning = false;
+  if (!shouldStop) toast(`Scan complete! ${ips.length} IPs processed`, 'toast-success');
+}
+
+function stopScan() {
+  shouldStop = true;
+  document.getElementById('stopBtn').style.display = 'none';
+  toast('Stopping scan...', '');
+}
+
+// ── STATS & TABLE ──────────────────────────────────────────────
+function getRowClass(vt) {
+  if (!vt || vt.error) return 'row-error';
+  if (vt.pct >= SUSPICIOUS_THRESHOLD) return 'row-malicious';
+  if (vt.suspicious > 0) return 'row-suspicious';
+  return 'row-clean';
+}
+function getRowFilterKey(vt) {
+  if (!vt || vt.error) return 'error';
+  if (vt.pct >= SUSPICIOUS_THRESHOLD) return 'malicious';
+  if (vt.suspicious > 0) return 'suspicious';
+  return 'clean';
+}
+function getBadge(vt) {
+  if (!vt) return `<span class="badge badge-scanning">QUEUED</span>`;
+  if (vt.error) return `<span class="badge badge-error">ERROR</span>`;
+  if (vt.pct >= SUSPICIOUS_THRESHOLD) return `<span class="badge badge-malicious">🔴 MALICIOUS</span>`;
+  if (vt.suspicious > 0) return `<span class="badge badge-suspicious">⚠️ SUSPICIOUS</span>`;
+  return `<span class="badge badge-clean">✅ CLEAN</span>`;
+}
+
+function updateStatsAndTable() {
+  let malicious = 0, suspicious = 0, clean = 0;
+  for (const [, res] of vtResults) {
+    if (!res.error) {
+      if (res.pct >= SUSPICIOUS_THRESHOLD) malicious++;
+      else if (res.suspicious > 0) suspicious++;
+      else clean++;
+    }
+  }
+  document.getElementById('totalIPs').textContent = filteredData.length;
+  document.getElementById('maliciousCount').textContent = malicious;
+  document.getElementById('suspiciousCount').textContent = suspicious;
+  document.getElementById('cleanCount').textContent = clean;
+  document.getElementById('statsPanel').style.display = 'flex';
+  renderTable();
+}
+
+function renderTable() {
+  const headers = ['Status', 'Attacker IP', 'VT %', 'Country', 'End Time', 'Name', 'Target', 'Vendor', 'Details'];
+  const th = document.getElementById('tableHeader');
+  const tb = document.getElementById('tableBody');
+  th.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+  tb.innerHTML = '';
+
+  const searchQ = (document.getElementById('ipSearchInput')?.value || '').toLowerCase().trim();
+  const vtPercentFilter = document.getElementById('vtPctSelectFilter')?.value || 'all';
+
+  for (const row of filteredData) {
+    const vt = vtResults.get(row.attackerAddress);
+    const rowClass = getRowClass(vt);
+    const filterKey = getRowFilterKey(vt);
+
+    // Table Category filter (All, Malicious, Suspicious, Clean)
+    if (tableFilter !== 'all' && filterKey !== tableFilter) continue;
+    
+    // IP search filter
+    if (searchQ && !row.attackerAddress.includes(searchQ)) continue;
+
+    // ADDED: VT % Filter check
+    if (vtPercentFilter !== 'all') {
+      if (!vt || vt.error) continue; // Exclude errored/unscanned rows
+      const pct = vt.pct || 0;
+      if (vtPercentFilter === 'gt0' && pct <= 0) continue;
+      if (vtPercentFilter === 'gt5' && pct <= 5) continue;
+      if (vtPercentFilter === 'gt15' && pct <= 15) continue;
+      if (vtPercentFilter === 'gt30' && pct <= 30) continue;
+      if (vtPercentFilter === 'gt50' && pct <= 50) continue;
+    }
+
+    const vtPct = vt && !vt.error ? vt.pct + '%' : (vt?.error ? '—' : '...');
+    const cacheTag = vt?.fromCache ? ' <span class="cache-tag">CACHE</span>' : '';
+
+    // ADDED: Full Country Name translation instead of 2-letter ISO
+    const rawCountry = vt?.country || row.country;
+    const fullCountry = getFullCountryName(rawCountry);
+    const target = row.targetAddress?.trim() ? row.targetAddress : '172.21.21.50';
+
+    const tr = document.createElement('tr');
+    tr.className = rowClass;
+    tr.innerHTML = `
+      <td>${getBadge(vt)}</td>
+      <td class="ip-cell">
+        <div class="ip-cell-wrap">
+          <span>${escapeHtml(row.attackerAddress)}</span>
+          <button class="copy-ip-btn" onclick="event.stopPropagation();copyText('${escapeHtml(row.attackerAddress)}')" title="Copy IP">📋</button>
+          ${cacheTag}
+        </div>
+      </td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:600;color:${vt && vt.pct >= SUSPICIOUS_THRESHOLD ? 'var(--red)' : vt && vt.suspicious > 0 ? 'var(--amber)' : 'var(--text2)'}">${escapeHtml(vtPct)}</td>
+      <td>${escapeHtml(fullCountry)}</td>
+      <td class="text-wrap-time" title="${escapeHtml(row.endTime)}">${escapeHtml(row.endTime)}</td>
+      <td class="text-wrap-truncate" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${escapeHtml(target)}</td>
+      <td class="text-wrap-vendor" title="${escapeHtml(row.deviceVendor)}">${escapeHtml(row.deviceVendor)}</td>
+      <td><button class="ip-detail-btn" onclick="showModal('${escapeHtml(row.attackerAddress)}')">🔍 View</button></td>
+    `;
+    tb.appendChild(tr);
+  }
+  document.getElementById('resultsCard').style.display = 'block';
+}
+
+// ── CHARTS ─────────────────────────────────────────────────────
+function updateCharts() {
+  if (vtResults.size === 0) return;
+  document.getElementById('chartsCard').style.display = 'block';
+
+  let malicious = 0, suspicious = 0, clean = 0;
+  const countryCounts = {};
+
+  for (const [ip, res] of vtResults) {
+    if (!res || res.error) continue;
+    if (res.pct >= SUSPICIOUS_THRESHOLD) malicious++;
+    else if (res.suspicious > 0) suspicious++;
+    else clean++;
+
+    const countryRaw = res.country && res.country !== '—' ? res.country : (filteredData.find(r => r.attackerAddress === ip)?.country || '');
+    if (countryRaw) {
+      // ADDED: Translate to full country name in charts as well!
+      const fullCountry = getFullCountryName(countryRaw);
+      countryCounts[fullCountry] = (countryCounts[fullCountry] || 0) + 1;
+    }
+  }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)';
+  const textColor = isDark ? '#cbd5e1' : '#475569';
+
+  // Pie Chart
+  const pieCtx = document.getElementById('pieChart').getContext('2d');
+  if (pieChartInst) pieChartInst.destroy();
+  pieChartInst = new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Malicious', 'Suspicious', 'Clean'],
+      datasets: [{
+        data: [malicious, suspicious, clean],
+        backgroundColor: [
+          isDark ? '#f87171' : '#ef4444',
+          isDark ? '#fbbf24' : '#f59e0b',
+          isDark ? '#34d399' : '#10b981'
+        ],
+        borderColor: isDark ? '#1e293b' : '#ffffff',
+        borderWidth: 2,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: textColor, font: { family: "'JetBrains Mono'", size: 11 }, padding: 14, boxWidth: 12 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} IPs` } }
+      },
+      cutout: '60%'
+    }
+  });
+
+  // Bar Chart (Top Countries)
+  const sortedCountries = Object.entries(countryCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  if (barChartInst) barChartInst.destroy();
+  barChartInst = new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: sortedCountries.map(([c]) => c),
+      datasets: [{
+        label: 'IPs',
+        data: sortedCountries.map(([,n]) => n),
+        backgroundColor: isDark ? 'rgba(99,102,241,0.65)' : 'rgba(79,70,229,0.65)',
+        borderColor: isDark ? 'rgba(99,102,241,1)' : 'rgba(79,70,229,1)',
+        borderWidth: 1,
+        borderRadius: 5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: textColor, font: { family: "'JetBrains Mono'", size: 10 } }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor, font: { family: "'JetBrains Mono'", size: 10 }, precision: 0 }, grid: { color: gridColor } }
+      }
+    }
+  });
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function showModal(ip) {
+  const vt = vtResults.get(ip);
+  document.getElementById('modalIP').textContent = ip;
+
+  if (!vt) {
+    document.getElementById('modalCountry').textContent = 'Not yet scanned';
+    document.getElementById('modalStats').innerHTML = '<div style="color:var(--muted);font-size:13px">No data available yet.</div>';
+    document.getElementById('detectionBar').style.display = 'none';
+    document.getElementById('vendorSection').style.display = 'none';
+    document.getElementById('suspVendorSection').style.display = 'none';
+    document.getElementById('modalVTLink').href = `https://www.virustotal.com/gui/ip-address/${ip}`;
+    document.getElementById('modalOverlay').classList.add('open');
+    return;
+  }
+  if (vt.error) {
+    document.getElementById('modalCountry').textContent = 'Error: ' + vt.error;
+    document.getElementById('modalStats').innerHTML = `<div style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;grid-column:1/-1">⚠️ ${escapeHtml(vt.error)}</div>`;
+    document.getElementById('detectionBar').style.display = 'none';
+    document.getElementById('vendorSection').style.display = 'none';
+    document.getElementById('suspVendorSection').style.display = 'none';
+    document.getElementById('modalVTLink').href = `https://www.virustotal.com/gui/ip-address/${ip}`;
+    document.getElementById('modalOverlay').classList.add('open');
+    return;
+  }
+
+  // Translate code specifically for modal display
+  const fullCountryName = getFullCountryName(vt.country);
+  const countryLine = [fullCountryName !== '—' ? fullCountryName : null, vt.asOwner !== '—' ? vt.asOwner : null].filter(Boolean).join(' · ');
+  document.getElementById('modalCountry').textContent = (countryLine || '—') + (vt.fromCache ? '  [cached]' : '');
+
+  document.getElementById('modalStats').innerHTML = `
+    <div class="modal-stat ms-malicious"><div class="modal-stat-val">${vt.malicious||0}</div><div class="modal-stat-lbl">Malicious</div></div>
+    <div class="modal-stat ms-suspicious"><div class="modal-stat-val">${vt.suspicious||0}</div><div class="modal-stat-lbl">Suspicious</div></div>
+    <div class="modal-stat ms-clean"><div class="modal-stat-val">${vt.harmless||0}</div><div class="modal-stat-lbl">Clean</div></div>
+    <div class="modal-stat ms-total"><div class="modal-stat-val">${vt.total||0}</div><div class="modal-stat-lbl">Total Engines</div></div>
+  `;
+
+  const db = document.getElementById('detectionBar');
+  if (vt.total > 0) {
+    db.style.display = 'block';
+    document.getElementById('detectionPct').textContent = vt.pct + '%';
+    const fill = document.getElementById('detectionFill');
+    fill.style.width = vt.pct + '%';
+    fill.style.background = vt.pct >= SUSPICIOUS_THRESHOLD ? 'linear-gradient(90deg,var(--amber),var(--red))' : 'linear-gradient(90deg,var(--green),var(--cyan))';
+  } else { db.style.display = 'none'; }
+
+  const vs = document.getElementById('vendorSection');
+  if (vt.maliciousVendors?.length) { vs.style.display = 'block'; document.getElementById('vendorList').innerHTML = vt.maliciousVendors.map(v => `<span class="vendor-tag vt-malicious">${escapeHtml(v)}</span>`).join(''); }
+  else vs.style.display = 'none';
+
+  const svs = document.getElementById('suspVendorSection');
+  if (vt.suspiciousVendors?.length) { svs.style.display = 'block'; document.getElementById('suspVendorList').innerHTML = vt.suspiciousVendors.map(v => `<span class="vendor-tag vt-suspicious">${escapeHtml(v)}</span>`).join(''); }
+  else svs.style.display = 'none';
+
+  document.getElementById('modalVTLink').href = vt.vtLink || `https://www.virustotal.com/gui/ip-address/${ip}`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModalDirect(); closeApiKeyModalDirect(); } });
+
+// ── EXPORT ─────────────────────────────────────────────────────
+function getExportRows() {
+  const rows = []; const eventCount = new Map(); let falsePositiveCount = 0; let maliciousCount = 0;
+  for (const row of filteredData) {
+    const vt = vtResults.get(row.attackerAddress);
+    const isMalicious = vt && !vt.error && vt.pct >= SUSPICIOUS_THRESHOLD;
+    const comment = isMalicious ? 'This IP is Malicious' : 'This is False Positive';
+    const report = isMalicious ? 'Yes' : 'NO';
+    const target = row.targetAddress?.trim() ? row.targetAddress : '172.21.21.50';
+    const eventName = row.name || 'Unknown';
+    eventCount.set(eventName, (eventCount.get(eventName) || 0) + 1);
+    if (isMalicious) maliciousCount++; else falsePositiveCount++;
+
+    // Translate to full country name in spreadsheet exports too!
+    const countryToExport = getFullCountryName(vt?.country || row.country);
+    rows.push({ endTime: row.endTime, name: row.name, attackerAddress: row.attackerAddress, targetAddress: target, country: countryToExport, deviceVendor: row.deviceVendor, comment, report, isMalicious });
+  }
+  return { rows, eventCount, falsePositiveCount, maliciousCount };
+}
+function exportToExcel() {
+  if (!filteredData.length) { toast('No data to export', 'toast-error'); return; }
+  const { rows, eventCount, falsePositiveCount, maliciousCount } = getExportRows();
+  const headers = ['End Time', 'Name', 'Attacker Address', 'Target Address', 'Country', 'Device Vendor', 'Comment', 'Report'];
+  const sheetData = [headers, ...rows.map(r => [r.endTime, r.name, r.attackerAddress, r.targetAddress, r.country, r.deviceVendor, r.comment, r.report])];
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  ws['!cols'] = [{wch:20},{wch:45},{wch:18},{wch:18},{wch:15},{wch:15},{wch:30},{wch:10}];
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:H1');
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    const isMaliciousRow = R > 0 && rows[R-1]?.isMalicious;
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({r:R,c:C});
+      if (!ws[addr]) continue;
+      ws[addr].s = { border: {top:{style:"thin",color:{rgb:"CCCCCC"}},bottom:{style:"thin",color:{rgb:"CCCCCC"}},left:{style:"thin",color:{rgb:"CCCCCC"}},right:{style:"thin",color:{rgb:"CCCCCC"}}} };
+      if (R === 0) { ws[addr].s.fill = {fgColor:{rgb:"1F2540"}}; ws[addr].s.font = {bold:true,color:{rgb:"FFFFFF"}}; }
+      else if (isMaliciousRow) ws[addr].s.fill = {fgColor:{rgb:"3D1A1F"}};
+      else ws[addr].s.fill = {fgColor:{rgb:"1A2D1F"}};
+    }
+  }
+  const summaryData = [['SCAN SUMMARY REPORT'],[''],['Scan Date:',new Date().toLocaleString()],['Threshold:',`≥ ${SUSPICIOUS_THRESHOLD}% = Malicious`],[''],['--- BREAKDOWN BY EVENT NAME ---'],['Event Name','Count']];
+  for (const [name, cnt] of eventCount) summaryData.push([name, cnt]);
+  summaryData.push([''],['--- STATUS SUMMARY ---'],['Category','Count'],['False Positive (Clean)',falsePositiveCount],['Malicious IPs',maliciousCount],[''],['Total Unique IPs Scanned',filteredData.length]);
+  const ws2 = XLSX.utils.aoa_to_sheet(summaryData);
+  ws2['!cols'] = [{wch:40},{wch:15}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Scan Results');
+  XLSX.utils.book_append_sheet(wb, ws2, 'Summary');
+  XLSX.writeFile(wb, `vt_scan_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xlsx`);
+  toast('Excel exported!', 'toast-success');
+}
+function exportToCSV() {
+  if (!filteredData.length) { toast('No data to export', 'toast-error'); return; }
+  const { rows } = getExportRows();
+  const headers = ['End Time','Name','Attacker Address','Target Address','Country','Device Vendor','Comment','Report'];
+  const csvRows = [headers.join(',')];
+  for (const r of rows) csvRows.push([r.endTime,r.name,r.attackerAddress,r.targetAddress,r.country,r.deviceVendor,r.comment,r.report].map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(','));
+  const blob = new Blob([csvRows.join('\n')], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = `vt_scan_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('CSV exported!', 'toast-success');
+}
+
+// Auth State
+let currentUser = null;
+
+function initAuth() {
+  // Ensure we have a default admin user registered
+  let usersStr = localStorage.getItem('analyst_users');
+  let users = {};
+  if (usersStr) {
+    users = JSON.parse(usersStr);
+  } else {
+    // Seed default administrator
+    users['admin'] = {
+      username: 'admin',
+      password: 'admin',
+      name: 'Chief Analyst',
+      apiKey: '',
+      threshold: 3,
+      allowedVendors: ['Apache', 'Firewall', 'ISE', 'Cisco'],
+      excludedIPs: ['10', '172', '192', '127']
+    };
+    localStorage.setItem('analyst_users', JSON.stringify(users));
+  }
+
+  // Check active session
+  const activeSessionStr = localStorage.getItem('current_analyst_user');
+  if (activeSessionStr) {
+    currentUser = JSON.parse(activeSessionStr);
+    showDashboard();
+  } else {
+    showAuthScreen();
+  }
+}
+
+function showAuthScreen() {
+  document.getElementById('authContainer').style.display = 'flex';
+  document.getElementById('mainAppContainer').style.display = 'none';
+  switchAuthTab('signin');
+}
+
+function showDashboard() {
+  document.getElementById('authContainer').style.display = 'none';
+  document.getElementById('mainAppContainer').style.display = 'block';
+  
+  // Render user initials and user labels
+  if (currentUser) {
+    document.getElementById('analystDisplayName').textContent = currentUser.name || 'SecOps Analyst';
+    document.getElementById('analystUsername').textContent = '@' + currentUser.username;
+    
+    const initials = (currentUser.name || 'AN')
+      .split(' ')
+      .map(w => w.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+    document.getElementById('analystInitials').textContent = initials;
+    const collapsedAv = document.getElementById('collapsedUserAvatar');
+    if (collapsedAv) collapsedAv.textContent = initials;
+    
+    if (currentUser.apiKey) {
+      document.getElementById('analystKeyStatus').textContent = 'Profile Key: ' + currentUser.apiKey.slice(0, 4) + '...' + currentUser.apiKey.slice(-4);
+      document.getElementById('analystKeyStatus').style.color = 'var(--cyan)';
+    } else {
+      document.getElementById('analystKeyStatus').textContent = 'Using system default key';
+      document.getElementById('analystKeyStatus').style.color = 'var(--muted)';
+    }
+  }
+  
+  loadSettings(); // Restores slider, tags, etc. based on active state variables
+}
+
+function switchAuthTab(tab) {
+  const signinForm = document.getElementById('authFormSignin');
+  const registerForm = document.getElementById('authFormRegister');
+  const tabSignin = document.getElementById('authTabBtnSignin');
+  const tabRegister = document.getElementById('authTabBtnRegister');
+  const errMsg = document.getElementById('authError');
+  
+  if (tab === 'signin') {
+    signinForm.style.display = 'flex';
+    registerForm.style.display = 'none';
+    tabSignin.classList.add('active');
+    tabRegister.classList.remove('active');
+  } else {
+    signinForm.style.display = 'none';
+    registerForm.style.display = 'flex';
+    tabSignin.classList.remove('active');
+    tabRegister.classList.add('active');
+  }
+  // Clear any auth errors
+  if (errMsg) {
+    errMsg.textContent = '';
+    errMsg.style.display = 'none';
+  }
+}
+
+function signInAnalyst(e) {
+  if (e) e.preventDefault();
+  const rawInp = document.getElementById('signinUsername').value.trim();
+  const passInp = document.getElementById('signinPassword').value;
+  const errMsg = document.getElementById('authError');
+  
+  if (!rawInp || !passInp) {
+    errMsg.textContent = 'Please provide both Name and Password';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  // Try matching search keys: either lowercased alphanumeric handle or raw name
+  const checkKey = rawInp.toLowerCase().replace(/[^a-z0-9]/g, '');
+  
+  let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
+  let user = users[checkKey];
+  
+  if (!user) {
+    // Also try case-insensitive name match
+    user = Object.values(users).find(u => u.name.trim().toLowerCase() === rawInp.toLowerCase());
+  }
+
+  if (!user || user.password !== passInp) {
+    errMsg.textContent = 'Invalid Name or Password';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  // Established session
+  currentUser = user;
+  localStorage.setItem('current_analyst_user', JSON.stringify(user));
+  showDashboard();
+  toast('Welcome back, ' + user.name + '!', 'toast-success');
+}
+
+function registerAnalyst(e) {
+  if (e) e.preventDefault();
+  const nameInp = document.getElementById('registerName').value.trim();
+  const passInp = document.getElementById('registerPassword').value;
+  const apiKeyInp = document.getElementById('registerApiKey').value.trim();
+  const errMsg = document.getElementById('authError');
+  
+  if (!nameInp || !passInp) {
+    errMsg.textContent = 'Name and Password are required';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  if (nameInp.length < 3) {
+    errMsg.textContent = 'Name must be at least 3 characters';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  if (passInp.length < 4) {
+    errMsg.textContent = 'Password must be at least 4 characters';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  const userInp = nameInp.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!userInp) {
+    errMsg.textContent = 'Name must contain letters or numbers';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
+  if (users[userInp]) {
+    errMsg.textContent = 'A user with this Name is already registered';
+    errMsg.style.display = 'block';
+    return;
+  }
+  
+  // Register user
+  const newUser = {
+    username: userInp,
+    password: passInp,
+    name: nameInp,
+    apiKey: apiKeyInp,
+    threshold: 3,
+    allowedVendors: ['Apache', 'Firewall', 'ISE', 'Cisco'],
+    excludedIPs: ['10', '172', '192', '127']
+  };
+  
+  users[userInp] = newUser;
+  localStorage.setItem('analyst_users', JSON.stringify(users));
+  
+  // Set as current user automatically
+  currentUser = newUser;
+  localStorage.setItem('current_analyst_user', JSON.stringify(newUser));
+  showDashboard();
+  toast('Account created successfully!', 'toast-success');
+}
+
+function signOutAnalyst() {
+  localStorage.removeItem('current_analyst_user');
+  currentUser = null;
+  // Clear layout inputs
+  document.getElementById('signinUsername').value = '';
+  document.getElementById('signinPassword').value = '';
+  document.getElementById('registerName').value = '';
+  document.getElementById('registerPassword').value = '';
+  document.getElementById('registerApiKey').value = '';
+  
+  showAuthScreen();
+  toast('Signed out successfully');
+}
+
+function toggleSubsection(id, chevronId) {
+  const content = document.getElementById(id);
+  const chevron = document.getElementById(chevronId);
+  if (!content) return;
+  const isHidden = content.style.display === 'none';
+  if (isHidden) {
+    content.style.display = 'block';
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  } else {
+    content.style.display = 'none';
+    if (chevron) chevron.style.transform = 'rotate(-90deg)';
+  }
+}
+
+function toggleSidebarEvent(e) {
+  if (e) e.stopPropagation();
+  toggleSidebar();
+}
+
+function attachSidebarToggleClick() {
+  const panel = document.getElementById('unifiedLeftPanel');
+  if (!panel) return;
+  
+  panel.addEventListener('click', function(e) {
+    const sidebar = document.querySelector('.side-left');
+    if (!sidebar) return;
+    
+    // If collapsed: clicking anywhere on it expands it
+    if (sidebar.classList.contains('collapsed')) {
+      toggleSidebar(false);
+      if (e) e.stopPropagation();
+      return;
+    }
+    
+    // If expanded: determine if the click was on the outer container or non-interactive areas
+    // to collapse/shrink it!
+    const target = e.target;
+    const isInteractive = target.closest('input, textarea, button, select, a, .tag, .tag-remove, .step-btn, .threshold-stepper, .tab-btn, .logout-btn');
+    if (!isInteractive) {
+      toggleSidebar(true);
+      if (e) e.stopPropagation();
+    }
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+(function init() { initAuth(); attachSidebarToggleClick(); })();
+</script>
+</body>
+</html>
