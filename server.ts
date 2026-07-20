@@ -1,6 +1,7 @@
 import express from "express";
 import path from "path";
 import https from "https";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 
@@ -9,6 +10,64 @@ const PORT = 3000;
 
 // Enable JSON body parsing for Gemini data payloads
 app.use(express.json({ limit: "15mb" }));
+
+const USERS_FILE_PATH = path.join(process.cwd(), "users-db.json");
+
+// Helper to read users from file with default seed
+function readUsersFromFile(): Record<string, any> {
+  try {
+    if (fs.existsSync(USERS_FILE_PATH)) {
+      const content = fs.readFileSync(USERS_FILE_PATH, "utf-8");
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error("Error reading users-db.json:", err);
+  }
+  // Default seed
+  return {
+    admin: {
+      username: "admin",
+      password: "admin",
+      name: "Chief Analyst",
+      apiKey: "",
+      abuseApiKey: "",
+      threshold: 3,
+      abuseThreshold: 30,
+      skipAbuseIfVTEnabled: true,
+      allowedVendors: ["apache", "Cisco ISE", "firewall"],
+      excludedIPs: ["10"]
+    }
+  };
+}
+
+function writeUsersToFile(users: Record<string, any>) {
+  try {
+    fs.writeFileSync(USERS_FILE_PATH, JSON.stringify(users, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Error writing users-db.json:", err);
+  }
+}
+
+// User accounts API endpoints for universal synchronization
+app.get("/api/auth/users", (req, res) => {
+  const users = readUsersFromFile();
+  res.json(users);
+});
+
+app.post("/api/auth/register", (req, res) => {
+  try {
+    const newUser = req.body;
+    if (!newUser || !newUser.username) {
+      return res.status(400).json({ error: "Invalid user payload" });
+    }
+    const users = readUsersFromFile();
+    users[newUser.username] = newUser;
+    writeUsersToFile(users);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 const DEFAULT_VT_API_KEY = "96cbdd43beeb6dbe81302b11c27ff5d4d2acd9e5bd9126e258b4abe64e2ac38d";
 

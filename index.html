@@ -3985,6 +3985,7 @@ async function saveApiKey() {
       users[currentUser.username].apiKey = currentUser.apiKey;
       users[currentUser.username].abuseApiKey = currentUser.abuseApiKey;
       localStorage.setItem('analyst_users', JSON.stringify(users));
+      syncUserToServer(users[currentUser.username]);
     }
   }
 
@@ -4121,6 +4122,7 @@ function saveSettings() {
       users[currentUser.username].allowedVendors = [...allowedVendors];
       users[currentUser.username].excludedIPs = [...excludedIPs];
       localStorage.setItem('analyst_users', JSON.stringify(users));
+      syncUserToServer(users[currentUser.username]);
     }
   }
   localStorage.setItem('threshold', SUSPICIOUS_THRESHOLD);
@@ -6657,7 +6659,18 @@ function exportWeeklyReport(format) {
 // Auth State
 let currentUser = null;
 
-function initAuth() {
+async function initAuth() {
+  // Sync registered users from backend server for cross-site persistence
+  try {
+    const res = await fetch('/api/auth/users');
+    if (res.ok) {
+      const serverUsers = await res.json();
+      localStorage.setItem('analyst_users', JSON.stringify(serverUsers));
+    }
+  } catch (err) {
+    console.error('Failed to sync users from backend:', err);
+  }
+
   // Ensure we have a default admin user registered
   let usersStr = localStorage.getItem('analyst_users');
   let users = {};
@@ -6705,6 +6718,15 @@ function initAuth() {
       }, 50);
     }
   }
+}
+
+function syncUserToServer(userObj) {
+  if (!userObj || !userObj.username) return;
+  fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userObj)
+  }).catch(err => console.error('Failed to sync user to server:', err));
 }
 
 function showAuthScreen() {
@@ -7028,6 +7050,7 @@ async function verifyAndLoginWithKeys(vtKey, abuseKey) {
       let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
       users[uniqueId] = userObj;
       localStorage.setItem('analyst_users', JSON.stringify(users));
+      syncUserToServer(userObj);
       
       currentUser = userObj;
       localStorage.setItem('current_analyst_user', JSON.stringify(userObj));
@@ -7156,6 +7179,13 @@ function registerAnalyst(e) {
   
   users[userInp] = newUser;
   localStorage.setItem('analyst_users', JSON.stringify(users));
+  
+  // Sync registration to server for cross-site persistence
+  fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newUser)
+  }).catch(err => console.error('Failed to sync registered user to server:', err));
   
   // Set as current user automatically
   currentUser = newUser;
