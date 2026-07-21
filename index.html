@@ -2839,9 +2839,9 @@ tbody tr:hover .copy-ip-btn {
     </div>
     
     <div class="auth-tabs">
-      <button class="auth-tab-btn active" id="authTabBtnSignin" onclick="switchAuthTab('signin')">Sign In</button>
+      <button class="auth-tab-btn" id="authTabBtnSignin" onclick="switchAuthTab('signin')">Sign In</button>
       <button class="auth-tab-btn" id="authTabBtnRegister" onclick="switchAuthTab('register')">Register</button>
-      <button class="auth-tab-btn" id="authTabBtnKeyFile" onclick="switchAuthTab('keyfile')">API Key File (.txt)</button>
+      <button class="auth-tab-btn active" id="authTabBtnKeyFile" onclick="switchAuthTab('keyfile')">API Key File (.txt)</button>
     </div>
 
     <div id="authError" style="display:none; color:var(--red); background:var(--red-dim); padding:10px; border-radius:6px; font-size:12px; font-family:'JetBrains Mono',monospace; border:1.5px dashed var(--red); text-align:center;"></div>
@@ -2972,15 +2972,12 @@ tbody tr:hover .copy-ip-btn {
         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" style="color: var(--cyan);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Export CSV
       </button>
-      <button id="exportMetricsToggleBtn" onclick="toggleExportMetrics()" class="icon-btn" disabled style="display: none; align-items: center; gap: 6px;" title="Defaults to: On the exported file vt/abuseip% column Excluded&#10;Switches on-click to: On the exported file vt/abuseip% column Include">
-        <span id="exportMetricsIconWrap" style="display: inline-flex; align-items: center; justify-content: center; color: var(--muted);">
-          <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
-        </span>
-        <span id="exportMetricsText" style="color: var(--muted);">Exclude</span>
-      </button>
-      <button class="icon-btn api-key-btn" id="apiKeyBtn" onclick="openApiKeyModal()" title="Show API Key">
-        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><circle cx="8" cy="15" r="4"/><line x1="11" y1="12" x2="21" y2="2"/><line x1="19" y1="4" x2="21" y2="6"/><line x1="15" y1="6" x2="17" y2="8"/></svg>
-        Show API Key
+      <button class="icon-btn" id="settingsBtn" onclick="openSettingsModal()" title="Settings & API Keys">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" style="color: var(--cyan);">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Settings
       </button>
       <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
         <svg id="themeIcon" viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2">
@@ -3172,27 +3169,6 @@ tbody tr:hover .copy-ip-btn {
                   </div>
                   <button type="button" onclick="clearWeeklyFile(event)" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--muted); cursor: pointer; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; padding: 0; width: 18px; height: 18px; border-radius: 4px; line-height: 1; transition: all 0.2s; font-weight: bold;" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,0,0,0.25)'; this.style.borderColor='rgba(255,0,0,0.3)';" onmouseout="this.style.color='var(--muted)'; this.style.background='rgba(255, 255, 255, 0.05)'; this.style.borderColor='rgba(255, 255, 255, 0.1)';" title="Remove file">✕</button>
                 </div>
-                
-                <div id="weeklyReportPreview" style="display:none; margin-top:16px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-                    <span style="font-weight:700; color:var(--cyan); font-size:11px; letter-spacing:0.5px">📊 WEEKLY REPORT PREVIEW</span>
-                    <div style="display:flex; gap:6px;">
-                      <button class="primary" onclick="exportWeeklyReport('xlsx')" style="padding: 4px 8px; font-size:11px; min-width:60px">📥 Excel</button>
-                      <button onclick="exportWeeklyReport('csv')" style="padding: 4px 8px; font-size:11px; min-width:60px">📥 CSV</button>
-                    </div>
-                  </div>
-                  <div style="max-height:280px; overflow-y:auto; border:1px solid rgba(0, 240, 255, 0.15); border-radius:6px; background: rgba(10, 15, 30, 0.65);">
-                    <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
-                      <thead>
-                        <tr style="background:#131930; color:#00f0ff; position:sticky; top:0; z-index:1;">
-                          <th style="padding:8px 10px; border-bottom:1px solid rgba(0, 240, 255, 0.15)">Summary</th>
-                          <th style="padding:8px 10px; border-bottom:1px solid rgba(0, 240, 255, 0.15); text-align:right">Count</th>
-                        </tr>
-                      </thead>
-                      <tbody id="weeklyReportTableBody"></tbody>
-                    </table>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -3363,13 +3339,17 @@ tbody tr:hover .copy-ip-btn {
   <div class="main-content">
     
     <!-- SYSTEM OVERVIEW -->
-    <div class="card" id="systemOverviewCard" style="margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid var(--border); background: var(--surface); border-radius: 8px;">
+    <div class="card" id="systemOverviewCard" style="display: block; margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid var(--border); background: var(--surface); border-radius: 8px;">
       <div id="systemOverviewHeader" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
         <h3 style="margin: 0; color: var(--text); font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--cyan)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           System Overview & Filter Setup
         </h3>
         <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div id="overviewTabs" style="display: none; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); padding: 2px; border-radius: 6px; border: 1px solid var(--border); margin-right: 4px;">
+            <button id="tabOverviewInfo" onclick="switchOverviewTab('info')" style="background: none; border: none; color: var(--text2); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.2s;">ℹ️ System Info</button>
+            <button id="tabOverviewWeekly" onclick="switchOverviewTab('weekly')" style="background: var(--cyan-dim); border: none; color: var(--cyan); font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: 600; transition: all 0.2s;">📊 Weekly Report</button>
+          </div>
           <span style="font-size: 0.75rem; color: var(--cyan); background: var(--cyan-dim); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2); font-weight: 600;">Active Processing Engine</span>
           <button id="toggleOverviewBtn" onclick="toggleOverviewBody()" class="icon-btn" style="background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Collapse/Expand">
             <svg id="overviewChevron" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s;"><polyline points="18 15 12 9 6 15"></polyline></svg>
@@ -3488,6 +3468,47 @@ tbody tr:hover .copy-ip-btn {
       </div> <!-- /systemOverviewBody -->
 
       <script>
+        window.switchOverviewTab = function(tab) {
+          const infoBody = document.getElementById('systemOverviewBody');
+          const weeklyBody = document.getElementById('weeklyReportSystemOverviewSection');
+          const tabInfo = document.getElementById('tabOverviewInfo');
+          const tabWeekly = document.getElementById('tabOverviewWeekly');
+          const toggleBtn = document.getElementById('toggleOverviewBtn');
+          
+          if (tab === 'info') {
+            if (infoBody) infoBody.style.display = 'block';
+            if (weeklyBody) weeklyBody.style.display = 'none';
+            if (tabInfo) {
+              tabInfo.style.background = 'var(--cyan-dim)';
+              tabInfo.style.color = 'var(--cyan)';
+              tabInfo.style.fontWeight = '600';
+            }
+            if (tabWeekly) {
+              tabWeekly.style.background = 'none';
+              tabWeekly.style.color = 'var(--text2)';
+              tabWeekly.style.fontWeight = '500';
+            }
+            if (toggleBtn) toggleBtn.style.display = 'flex';
+          } else if (tab === 'weekly') {
+            if (infoBody) infoBody.style.display = 'none';
+            if (weeklyBody) weeklyBody.style.display = 'block';
+            if (tabWeekly) {
+              tabWeekly.style.background = 'var(--cyan-dim)';
+              tabWeekly.style.color = 'var(--cyan)';
+              tabWeekly.style.fontWeight = '600';
+            }
+            if (tabInfo) {
+              tabInfo.style.background = 'none';
+              tabInfo.style.color = 'var(--text2)';
+              tabInfo.style.fontWeight = '500';
+            }
+            if (typeof toggleOverviewBody === 'function') {
+              toggleOverviewBody(true);
+            }
+            if (toggleBtn) toggleBtn.style.display = 'none';
+          }
+        };
+
         window.updateSystemOverviewPanel = function() {
           const overviewSuspiciousThreshold = document.getElementById('overviewSuspiciousThreshold');
           if (overviewSuspiciousThreshold && typeof SUSPICIOUS_THRESHOLD !== 'undefined' && typeof ABUSE_THRESHOLD !== 'undefined') {
@@ -3524,6 +3545,118 @@ tbody tr:hover .copy-ip-btn {
     
     <!-- RIGHT COLUMN: Results & Analytics -->
     <div class="side-right">
+    
+    <!-- WEEKLY SUMMARY REPORT PREVIEW CARD -->
+    <div class="card" id="weeklyReportPreviewCard" style="display: none; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border); background: var(--surface); border-radius: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+        <h3 style="margin: 0; color: var(--text); font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span>📊 Weekly Summary Report Preview</span>
+        </h3>
+        <span style="font-size: 0.75rem; color: var(--cyan); background: var(--cyan-dim); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(0, 240, 255, 0.2); font-weight: 600;">Interactive Overview</span>
+      </div>
+      
+      <!-- Banner / Header with file info -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 240, 255, 0.03); border: 1px solid rgba(0, 240, 255, 0.15); padding: 1rem; border-radius: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">📊</span>
+          <div>
+            <div style="font-size: 0.9rem; font-weight: 600; color: var(--text);">Weekly Summary Report Processed</div>
+            <div id="weeklySystemOverviewFileName" style="font-size: 0.75rem; color: var(--cyan); font-family: 'JetBrains Mono', monospace; margin-top: 2px;">No file loaded</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--muted); cursor: pointer; user-select: none; border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; background: rgba(255,255,255,0.03); margin-right: 4px;">
+            <input type="checkbox" id="includeDailyEventsInExport" style="cursor: pointer; width: 14px; height: 14px; accent-color: var(--cyan);" />
+            <span>Include Daily Breakdowns</span>
+          </label>
+          <button class="primary" onclick="exportWeeklyReport('xlsx')" style="padding: 6px 12px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+            <span>📥 Excel Report</span>
+          </button>
+          <button class="secondary" onclick="exportWeeklyReport('csv')" style="padding: 6px 12px; font-size: 0.78rem; font-weight: 600; background: var(--surface2); border: 1px solid var(--border); color: var(--text); cursor: pointer; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+            <span>📥 CSV Report</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3 Bento Box Metric Cards -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 1rem; text-align: center;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--green); margin-bottom: 0.5rem; font-weight: 600;">Total Events</div>
+          <div id="weeklyTotalCountCard" style="font-size: 2rem; font-weight: 700; color: #4ade80; font-family: 'JetBrains Mono', monospace;">0</div>
+        </div>
+        <div style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 1rem; text-align: center;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--red); margin-bottom: 0.5rem; font-weight: 600;">Detected Events</div>
+          <div id="weeklyDetectedCountCard" style="font-size: 2rem; font-weight: 700; color: #ff9999; font-family: 'JetBrains Mono', monospace;">0</div>
+        </div>
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 1rem; text-align: center;">
+          <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--amber); margin-bottom: 0.5rem; font-weight: 600;">False Positive Events</div>
+          <div id="weeklyFalsePositiveCountCard" style="font-size: 2rem; font-weight: 700; color: #fde047; font-family: 'JetBrains Mono', monospace;">0</div>
+        </div>
+      </div>
+
+      <!-- Details Grid: Left (Category Counts), Middle (Detected Daily breakdown), Right (FP Daily breakdown) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <!-- Category counts -->
+        <div>
+          <h4 style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+            <span>📋 Category Summary</span>
+          </h4>
+          <div style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.15); max-height: 350px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
+              <thead>
+                <tr style="background: var(--surface2); border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; position: sticky; top: 0; z-index: 1;">
+                  <th style="padding: 8px 12px; font-weight: 600;">Event Name</th>
+                  <th style="padding: 8px 12px; font-weight: 600; text-align: right; width: 80px;">Count</th>
+                </tr>
+              </thead>
+              <tbody id="weeklySystemOverviewTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Daily Detected Events details -->
+        <div>
+          <h4 style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: #ff6b6b; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+            <span>📅 Daily Detected Events</span>
+          </h4>
+          <div style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.15); max-height: 350px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
+              <thead>
+                <tr style="background: var(--surface2); border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; position: sticky; top: 0; z-index: 1;">
+                  <th style="padding: 8px 12px; font-weight: 600;">Day / Sheet Name</th>
+                  <th style="padding: 8px 12px; font-weight: 600; text-align: right; width: 100px;">Count</th>
+                </tr>
+              </thead>
+              <tbody id="weeklySystemOverviewDailyDetectedTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Daily False Positive details -->
+        <div>
+          <h4 style="margin: 0 0 0.75rem 0; font-size: 0.85rem; color: #f5c653; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+            <span>📅 Daily False Positives</span>
+          </h4>
+          <div style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: rgba(0,0,0,0.15); max-height: 350px; overflow-y: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
+              <thead>
+                <tr style="background: var(--surface2); border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.75rem; position: sticky; top: 0; z-index: 1;">
+                  <th style="padding: 8px 12px; font-weight: 600;">Day / Sheet Name</th>
+                  <th style="padding: 8px 12px; font-weight: 600; text-align: right; width: 100px;">FP Count</th>
+                </tr>
+              </thead>
+              <tbody id="weeklySystemOverviewDailyTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- Progress (Now on the right side of control station) -->
     <div class="card progress-container" id="progressContainer" style="display:none; margin-bottom: 1.5rem; border: 1px solid rgba(0, 240, 255, 0.25); background: rgba(0, 240, 255, 0.02); padding: 1.5rem;">
@@ -3686,59 +3819,101 @@ tbody tr:hover .copy-ip-btn {
   </div>
 </div>
 
-<!-- API KEY MODAL -->
+<!-- SETTINGS & API KEY MODAL -->
 <div class="modal-overlay" id="apikeyOverlay" onclick="closeApiKeyModal(event)">
-  <div class="apikey-modal">
+  <div class="apikey-modal" style="max-width: 520px;">
     <button class="modal-close" onclick="closeApiKeyModalDirect()">✕</button>
     
     <!-- Header -->
-    <div style="font-size:1.15rem;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px">
-      <span>🔑 API Keys Manager</span>
-    </div>
-    
-    <!-- VirusTotal Section -->
-    <div style="margin-bottom: 18px;">
-      <div style="font-size:0.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <span>VirusTotal API Key</span>
-        <span style="font-size:10px;font-weight:normal;color:var(--muted);font-family:'JetBrains Mono',monospace">vt_api_key</span>
-      </div>
-      <div style="position:relative; display:flex; gap:6px; align-items:center; margin-top:6px;">
-        <input class="apikey-input" id="apikeyInput" type="password" placeholder="No custom key configured..." autocomplete="off" style="margin:0; flex:1; padding-right:75px;">
-        <div style="position:absolute; right:8px; display:flex; gap:4px;">
-          <button onclick="toggleApiKeyVisible('apikeyInput', 'vtToggleBtn')" id="vtToggleBtn" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Toggle visibility">👁</button>
-          <button onclick="copyKeyValue('apikeyInput', 'VirusTotal')" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Copy to clipboard">📋</button>
-        </div>
-      </div>
-      <!-- Validation Status display for VirusTotal -->
-      <div id="vtValidationStatus" style="font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:8px; display:flex; align-items:center; justify-content:space-between; min-height:18px;">
-        <span class="status-text" style="color:var(--muted)">Status: Unchecked</span>
-        <button onclick="validateKeyDirect('vt')" class="icon-btn" style="padding:2px 8px; font-size:10px; height:auto; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Validate this key">Test Key</button>
-      </div>
+    <div style="font-size:1.15rem;font-weight:700;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);padding-bottom:12px">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" style="color: var(--cyan);"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>⚙️ Settings & API Keys</span>
     </div>
 
-    <!-- AbuseIPDB Section -->
-    <div style="margin-bottom: 18px;">
-      <div style="font-size:0.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <span>AbuseIPDB API Key</span>
-        <span style="font-size:10px;font-weight:normal;color:var(--muted);font-family:'JetBrains Mono',monospace">abuse_api_key</span>
+    <!-- Export Configurations Section -->
+    <div style="margin-bottom: 24px;">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Export Options</div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        
+        <!-- VT % & Abuse IP % Toggle Row -->
+        <div style="display:flex; align-items:center; justify-content:space-between; background:var(--input-bg); padding:10px 12px; border-radius:8px; border:1px solid var(--border)">
+          <div style="flex:1; padding-right:12px;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text)">Export VT% & Abuse IP% Columns</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4;">Toggle to include or exclude VirusTotal % and AbuseIPDB % columns in the daily report export.</div>
+          </div>
+          <button id="exportMetricsToggleBtn" onclick="toggleExportMetrics()" class="icon-btn" style="align-items: center; gap: 6px; display: inline-flex; height: 32px;" title="Exclude VT% & Abuse IP %">
+            <span id="exportMetricsIconWrap" style="display: inline-flex; align-items: center; justify-content: center; color: var(--muted);">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </span>
+            <span id="exportMetricsText" style="color: var(--muted); font-size:11px; font-weight:600;">Exclude VT% & Abuse IP %</span>
+          </button>
+        </div>
+
+        <!-- Daily Summaries Toggle Row -->
+        <div style="display:flex; align-items:center; justify-content:space-between; background:var(--input-bg); padding:10px 12px; border-radius:8px; border:1px solid var(--border)">
+          <div style="flex:1; padding-right:12px;">
+            <div style="font-size:0.85rem; font-weight:600; color:var(--text)">Export Daily Summaries</div>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4;">Toggle to include or exclude daily summary tables at the bottom of the daily report export.</div>
+          </div>
+          <button id="exportDailySummaryToggleBtn" onclick="toggleExportDailySummary()" class="icon-btn" style="align-items: center; gap: 6px; display: inline-flex; height: 32px;" title="Exclude Daily Summary">
+            <span id="exportDailySummaryIconWrap" style="display: inline-flex; align-items: center; justify-content: center; color: var(--muted);">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </span>
+            <span id="exportDailySummaryText" style="color: var(--muted); font-size:11px; font-weight:600;">Exclude Daily Summary</span>
+          </button>
+        </div>
+
       </div>
-      <div style="position:relative; display:flex; gap:6px; align-items:center; margin-top:6px;">
-        <input class="apikey-input" id="abuseApikeyInput" type="password" placeholder="No custom key configured..." autocomplete="off" style="margin:0; flex:1; padding-right:75px;">
-        <div style="position:absolute; right:8px; display:flex; gap:4px;">
-          <button onclick="toggleApiKeyVisible('abuseApikeyInput', 'abuseToggleBtn')" id="abuseToggleBtn" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Toggle visibility">👁</button>
-          <button onclick="copyKeyValue('abuseApikeyInput', 'AbuseIPDB')" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Copy to clipboard">📋</button>
+    </div>
+    
+    <!-- API Keys Section -->
+    <div style="margin-bottom: 20px; border-top:1px solid var(--border); padding-top:20px;">
+      <div style="font-size:0.8rem;font-weight:700;color:var(--cyan);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">API Keys Configuration</div>
+      
+      <!-- VirusTotal Section -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>VirusTotal API Key</span>
+          <span style="font-size:10px;font-weight:normal;color:var(--muted);font-family:'JetBrains Mono',monospace">vt_api_key</span>
+        </div>
+        <div style="position:relative; display:flex; gap:6px; align-items:center; margin-top:6px;">
+          <input class="apikey-input" id="apikeyInput" type="password" placeholder="No custom key configured..." autocomplete="off" style="margin:0; flex:1; padding-right:75px;">
+          <div style="position:absolute; right:8px; display:flex; gap:4px;">
+            <button onclick="toggleApiKeyVisible('apikeyInput', 'vtToggleBtn')" id="vtToggleBtn" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Toggle visibility">👁</button>
+            <button onclick="copyKeyValue('apikeyInput', 'VirusTotal')" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Copy to clipboard">📋</button>
+          </div>
+        </div>
+        <!-- Validation Status display for VirusTotal -->
+        <div id="vtValidationStatus" style="font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:8px; display:flex; align-items:center; justify-content:space-between; min-height:18px;">
+          <span class="status-text" style="color:var(--muted)">Status: Unchecked</span>
+          <button onclick="validateKeyDirect('vt')" class="icon-btn" style="padding:2px 8px; font-size:10px; height:auto; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Validate this key">Test Key</button>
         </div>
       </div>
-      <!-- Validation Status display for AbuseIPDB -->
-      <div id="abuseValidationStatus" style="font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:8px; display:flex; align-items:center; justify-content:space-between; min-height:18px;">
-        <span class="status-text" style="color:var(--muted)">Status: Unchecked</span>
-        <button onclick="validateKeyDirect('abuse')" class="icon-btn" style="padding:2px 8px; font-size:10px; height:auto; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Validate this key">Test Key</button>
+
+      <!-- AbuseIPDB Section -->
+      <div style="margin-bottom: 16px;">
+        <div style="font-size:0.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>AbuseIPDB API Key</span>
+          <span style="font-size:10px;font-weight:normal;color:var(--muted);font-family:'JetBrains Mono',monospace">abuse_api_key</span>
+        </div>
+        <div style="position:relative; display:flex; gap:6px; align-items:center; margin-top:6px;">
+          <input class="apikey-input" id="abuseApikeyInput" type="password" placeholder="No custom key configured..." autocomplete="off" style="margin:0; flex:1; padding-right:75px;">
+          <div style="position:absolute; right:8px; display:flex; gap:4px;">
+            <button onclick="toggleApiKeyVisible('abuseApikeyInput', 'abuseToggleBtn')" id="abuseToggleBtn" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Toggle visibility">👁</button>
+            <button onclick="copyKeyValue('abuseApikeyInput', 'AbuseIPDB')" style="padding:4px 8px; font-size:11px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Copy to clipboard">📋</button>
+          </div>
+        </div>
+        <!-- Validation Status display for AbuseIPDB -->
+        <div id="abuseValidationStatus" style="font-size:11px; font-family:'JetBrains Mono',monospace; margin-top:8px; display:flex; align-items:center; justify-content:space-between; min-height:18px;">
+          <span class="status-text" style="color:var(--muted)">Status: Unchecked</span>
+          <button onclick="validateKeyDirect('abuse')" class="icon-btn" style="padding:2px 8px; font-size:10px; height:auto; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; cursor:pointer;" title="Validate this key">Test Key</button>
+        </div>
       </div>
     </div>
 
     <!-- Save Action -->
     <div style="display:flex;gap:8px;margin-top:16px">
-      <button class="primary" onclick="saveApiKey()" style="flex:1; height:38px;">💾 Save Keys</button>
+      <button class="primary" onclick="saveApiKey()" style="flex:1; height:38px;">💾 Save Keys & Settings</button>
     </div>
     
     <div class="apikey-status" id="apikeyStatus" style="margin-top:8px; text-align:center;"></div>
@@ -3758,6 +3933,7 @@ let SUSPICIOUS_THRESHOLD = 3;
 let ABUSE_THRESHOLD = 30;
 let skipAbuseIfVTEnabled = true;
 let includeVTAndAbuseInExport = false;
+let includeDailySummaryInExport = false;
 let filteredData = [];
 let vtResults = new Map();
 let isScanning = false;
@@ -3767,7 +3943,7 @@ let currentUploadedFileName = '';
 // DEFAULT tab is file (Upload CSV)
 let currentInputType = 'file';
 let allowedVendors = new Set(['apache', 'Cisco ISE', 'firewall']);
-let excludedIPs = new Set(['10']);
+let excludedIPs = new Set(['10', '127']);
 let tableFilter = 'all'; // all | malicious | suspicious | clean
 let pieChartInst = null;
 let barChartInst = null;
@@ -3851,6 +4027,9 @@ function openApiKeyModal() {
   // Trigger auto-validation
   validateKeyDirect('vt');
   validateKeyDirect('abuse');
+}
+function openSettingsModal() {
+  openApiKeyModal();
 }
 function closeApiKeyModal(e) { if (e.target === document.getElementById('apikeyOverlay')) closeApiKeyModalDirect(); }
 function closeApiKeyModalDirect() { document.getElementById('apikeyOverlay').classList.remove('open'); }
@@ -4001,7 +4180,6 @@ function renderKeyStatus() {
 function setExportButtonsState(enabled) {
   const excelBtn = document.getElementById('exportExcelBtn');
   const csvBtn = document.getElementById('exportCsvBtn');
-  const metricsBtn = document.getElementById('exportMetricsToggleBtn');
   if (excelBtn) {
     excelBtn.disabled = !enabled;
     excelBtn.style.display = enabled ? 'inline-flex' : 'none';
@@ -4009,10 +4187,6 @@ function setExportButtonsState(enabled) {
   if (csvBtn) {
     csvBtn.disabled = !enabled;
     csvBtn.style.display = enabled ? 'inline-flex' : 'none';
-  }
-  if (metricsBtn) {
-    metricsBtn.disabled = !enabled;
-    metricsBtn.style.display = enabled ? 'inline-flex' : 'none';
   }
 }
 
@@ -4042,8 +4216,12 @@ function loadSettings() {
     }
     if (currentUser.excludedIPs) {
       let loaded = currentUser.excludedIPs;
-      if (loaded.includes('172') || loaded.includes('192') || loaded.includes('127')) {
-        loaded = ['10'];
+      if (loaded.includes('172') || loaded.includes('192')) {
+        loaded = ['10', '127'];
+        currentUser.excludedIPs = loaded;
+        setTimeout(saveSettings, 100);
+      } else if (!loaded.includes('127')) {
+        loaded.push('127');
         currentUser.excludedIPs = loaded;
         setTimeout(saveSettings, 100);
       }
@@ -4072,13 +4250,16 @@ function loadSettings() {
     const savedExcludes = localStorage.getItem('excludedIPs');
     if (savedExcludes) {
       let loaded = JSON.parse(savedExcludes);
-      if (loaded.includes('172') || loaded.includes('192') || loaded.includes('127')) {
-        loaded = ['10'];
+      if (loaded.includes('172') || loaded.includes('192')) {
+        loaded = ['10', '127'];
+        localStorage.setItem('excludedIPs', JSON.stringify(loaded));
+      } else if (!loaded.includes('127')) {
+        loaded.push('127');
         localStorage.setItem('excludedIPs', JSON.stringify(loaded));
       }
       excludedIPs = new Set(loaded);
     } else {
-      excludedIPs = new Set(['10']);
+      excludedIPs = new Set(['10', '127']);
     }
   }
   
@@ -4095,6 +4276,7 @@ function loadSettings() {
     skipToggleEl.checked = skipAbuseIfVTEnabled;
   }
   updateExportMetricsBtnUI();
+  updateExportDailySummaryBtnUI();
   renderVendorTags(); renderExcludeTags();
 
   // Restore sidebar master collapsed state only if data exists, otherwise force open by default before upload
@@ -4184,16 +4366,16 @@ function updateExportMetricsBtnUI() {
   if (!btn || !iconWrap || !text) return;
 
   if (includeVTAndAbuseInExport) {
-    text.textContent = 'Include';
-    btn.title = "On the exported file vt/abuseip% column Include\nSwitches on-click to: On the exported file vt/abuseip% column Excluded";
+    text.textContent = 'Include VT% & Abuse IP %';
+    btn.title = "On the exported file vt/abuseip% column Included\nSwitches on-click to: On the exported file vt/abuseip% column Excluded";
     btn.style.borderColor = 'rgba(0, 240, 255, 0.4)';
     btn.style.background = 'rgba(0, 240, 255, 0.05)';
     iconWrap.style.color = 'var(--cyan)';
     iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>`;
     text.style.color = '#ffffff';
   } else {
-    text.textContent = 'Exclude';
-    btn.title = "Defaults to: On the exported file vt/abuseip% column Excluded\nSwitches on-click to: On the exported file vt/abuseip% column Include";
+    text.textContent = 'Exclude VT% & Abuse IP %';
+    btn.title = "Defaults to: On the exported file vt/abuseip% column Excluded\nSwitches on-click to: On the exported file vt/abuseip% column Included";
     btn.style.borderColor = 'var(--border)';
     btn.style.background = 'transparent';
     iconWrap.style.color = 'var(--muted)';
@@ -4201,6 +4383,37 @@ function updateExportMetricsBtnUI() {
     text.style.color = 'var(--muted)';
   }
   if (window.updateSystemOverviewPanel) window.updateSystemOverviewPanel();
+}
+
+function toggleExportDailySummary() {
+  includeDailySummaryInExport = !includeDailySummaryInExport;
+  updateExportDailySummaryBtnUI();
+  toast(includeDailySummaryInExport ? 'Export will include daily summary tables' : 'Export will exclude daily summary tables (Grand Total is still included)');
+}
+
+function updateExportDailySummaryBtnUI() {
+  const btn = document.getElementById('exportDailySummaryToggleBtn');
+  const iconWrap = document.getElementById('exportDailySummaryIconWrap');
+  const text = document.getElementById('exportDailySummaryText');
+  if (!btn || !iconWrap || !text) return;
+
+  if (includeDailySummaryInExport) {
+    text.textContent = 'Include Daily Summary';
+    btn.title = "Exported file will include daily summaries\nSwitches on-click to: Exclude daily summaries";
+    btn.style.borderColor = 'rgba(0, 240, 255, 0.4)';
+    btn.style.background = 'rgba(0, 240, 255, 0.05)';
+    iconWrap.style.color = 'var(--cyan)';
+    iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 4"/></svg>`;
+    text.style.color = '#ffffff';
+  } else {
+    text.textContent = 'Exclude Daily Summary';
+    btn.title = "Defaults to: Exclude daily summaries\nSwitches on-click to: Include daily summaries";
+    btn.style.borderColor = 'var(--border)';
+    btn.style.background = 'transparent';
+    iconWrap.style.color = 'var(--muted)';
+    iconWrap.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
+    text.style.color = 'var(--muted)';
+  }
 }
 
 function renderVendorTags() {
@@ -5046,6 +5259,7 @@ function processData(parsed) {
     updateStatsAndTable();
     updateCharts();
     toast(`Successfully loaded pre-scanned report with ${filteredData.length} records`);
+    toggleSidebar(true);
   } else {
     document.getElementById('scanBtn').disabled = false;
     toast(`Filtered: ${filteredData.length} unique IPs ready to scan`);
@@ -5064,7 +5278,10 @@ function resetUI() {
   const systemOverview = document.getElementById('systemOverviewCard');
   if (systemOverview) {
     systemOverview.style.display = 'block';
-    toggleOverviewBody(true);
+  }
+  const weeklyReportPreviewCard = document.getElementById('weeklyReportPreviewCard');
+  if (weeklyReportPreviewCard) {
+    weeklyReportPreviewCard.style.display = 'none';
   }
 }
 function clearAll() {
@@ -5098,7 +5315,14 @@ function clearAll() {
     window.weeklyReportData = null;
     window.weeklyOriginalWorkbook = null;
     window.weeklyOriginalFileBuffer = null;
+    window.weeklyUploadFileName = null;
   }
+
+  // Reset system overview tabs and panel
+  const tabsWrap = document.getElementById('overviewTabs');
+  if (tabsWrap) tabsWrap.style.display = 'none';
+  if (typeof switchOverviewTab === 'function') switchOverviewTab('info');
+
   toast('Cleared all data');
   toggleSidebar(false);
 }
@@ -5146,8 +5370,11 @@ async function startScan() {
   // Collapse left panel on desktop so results show next to it
   toggleSidebar(true);
 
-  // Collapse system overview on start scan
-  toggleOverviewBody(false);
+  // Hide system overview card on start scan
+  const systemOverview = document.getElementById('systemOverviewCard');
+  if (systemOverview) {
+    systemOverview.style.display = 'none';
+  }
 
   isScanning = true; shouldStop = false;
   vtResults.clear();
@@ -5265,10 +5492,11 @@ async function startScan() {
   if (!shouldStop) toast(`Scan complete! ${ips.length} IPs processed`, 'toast-success');
 
   // Hide system overview card after scan completes
-  const systemOverview = document.getElementById('systemOverviewCard');
-  if (systemOverview) {
-    systemOverview.style.display = 'none';
+  const soCard = document.getElementById('systemOverviewCard');
+  if (soCard) {
+    soCard.style.display = 'none';
   }
+  toggleSidebar(true);
 }
 
 function stopScan() {
@@ -5727,12 +5955,33 @@ function getExportFileNameOfReport(rows, defaultPrefix, extension) {
     }
   }
 
+  const standardMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  if (defaultPrefix === 'weekly_report') {
+    let refDate = new Date();
+    if (dates.length > 0) {
+      dates.sort((a, b) => a.getTime() - b.getTime());
+      refDate = dates[0];
+    }
+    const dayOfWeek = refDate.getDay();
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(refDate);
+    monday.setDate(refDate.getDate() + diffToMonday);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const m1 = standardMonths[monday.getMonth()];
+    const d1 = monday.getDate();
+    const m2 = standardMonths[sunday.getMonth()];
+    const d2 = sunday.getDate();
+
+    return `${m1} ${d1} - ${m2} ${d2} weekly report.${extension}`;
+  }
+
   if (dates.length === 0) {
     const prefix = defaultPrefix || 'report';
     const ext = extension || 'txt';
-    if (prefix === 'weekly_report') {
-      return `weekly report_${new Date().toISOString().slice(0, 10)}.${ext}`;
-    }
     return `${prefix}_scanned_${new Date().toISOString().slice(0, 10)}.${ext}`;
   }
 
@@ -5742,8 +5991,6 @@ function getExportFileNameOfReport(rows, defaultPrefix, extension) {
   const firstDate = dates[0];
   const lastDate = dates[dates.length - 1];
 
-  const standardMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  
   const m1 = standardMonths[firstDate.getMonth()];
   const d1 = firstDate.getDate();
   const y1 = firstDate.getFullYear();
@@ -5767,9 +6014,6 @@ function getExportFileNameOfReport(rows, defaultPrefix, extension) {
     dateRangeStr = `${m1} ${d1} ${y1} - ${m2} ${d2} ${y2}`;
   }
 
-  if (defaultPrefix === 'weekly_report') {
-    return `${dateRangeStr} weekly report.${extension}`;
-  }
   if (defaultPrefix === 'vt_scan') {
     return `${dateRangeStr} scanned.${extension}`;
   }
@@ -5857,49 +6101,51 @@ function exportToExcel() {
     return Object.keys(groupedByDate).indexOf(a) - Object.keys(groupedByDate).indexOf(b);
   });
 
-  // 2. Append per-date summaries at the bottom
-  for (const dStr of sortedDates) {
-    const group = groupedByDate[dStr];
+  // 2. Append per-date summaries at the bottom (conditional)
+  if (includeDailySummaryInExport) {
+    for (const dStr of sortedDates) {
+      const group = groupedByDate[dStr];
 
-    // Date header: e.g., "Jun 15 summary"
-    sheetData.push(getSummaryRow(`${dStr} summary`));
-    cellStyles[`${curRow},1`] = {
-      font: { bold: true, sz: 12 },
-      fill: { fgColor: { rgb: "E2E8F0" } }
-    };
-    curRow++;
+      // Date header: e.g., "Jun 15 summary"
+      sheetData.push(getSummaryRow(`${dStr} summary`));
+      cellStyles[`${curRow},1`] = {
+        font: { bold: true, sz: 12 },
+        fill: { fgColor: { rgb: "E2E8F0" } }
+      };
+      curRow++;
 
-    // Table Header: "Summary" | "Count"
-    sheetData.push(getSummaryRow('Summary', 'Count'));
-    cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "1F2540" } } };
-    cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "1F2540" } } };
-    curRow++;
+      // Table Header: "Summary" | "Count"
+      sheetData.push(getSummaryRow('Summary', 'Count'));
+      cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "1F2540" } } };
+      cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "1F2540" } } };
+      curRow++;
 
-    // Individual event name list
-    for (const eName of allEventNames) {
-      const count = group.malEvents[eName] || 0;
-      sheetData.push(getSummaryRow(eName, count));
-      cellStyles[`${curRow},1`] = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFFFF" } } };
-      cellStyles[`${curRow},2`] = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFFFF" } } };
+      // Individual event name list
+      for (const eName of allEventNames) {
+        const count = group.malEvents[eName] || 0;
+        sheetData.push(getSummaryRow(eName, count));
+        cellStyles[`${curRow},1`] = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFFFF" } } };
+        cellStyles[`${curRow},2`] = { font: { color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFFFF" } } };
+        curRow++;
+      }
+
+      // False Positive row
+      sheetData.push(getSummaryRow('False Positive', group.falsePositiveCount));
+      cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFF00" } } };
+      cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFF00" } } };
+      curRow++;
+
+      // Total row showing summation of both malicious and false positive
+      const totalCount = group.totalMalicious + group.falsePositiveCount;
+      sheetData.push(getSummaryRow('Total', totalCount));
+      cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "27AE60" } } };
+      cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "27AE60" } } };
+      curRow++;
+
+      // Spacer row after each summary group
+      sheetData.push(getSpacer());
       curRow++;
     }
-
-    // False Positive row
-    sheetData.push(getSummaryRow('False Positive', group.falsePositiveCount));
-    cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFF00" } } };
-    cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "000000" } }, fill: { fgColor: { rgb: "FFFF00" } } };
-    curRow++;
-
-    // Total row showing summation of both malicious and false positive
-    const totalCount = group.totalMalicious + group.falsePositiveCount;
-    sheetData.push(getSummaryRow('Total', totalCount));
-    cellStyles[`${curRow},1`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "27AE60" } } };
-    cellStyles[`${curRow},2`] = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "27AE60" } } };
-    curRow++;
-
-    // Spacer row after each summary group
-    sheetData.push(getSpacer());
-    curRow++;
   }
 
   // 3. Append Grand Total Summary at the very bottom
@@ -6085,31 +6331,33 @@ function exportToCSV() {
     return Object.keys(groupedByDate).indexOf(a) - Object.keys(groupedByDate).indexOf(b);
   });
 
-  // Append Summaries per-date at the bottom
-  for (const dStr of sortedDates) {
-    const group = groupedByDate[dStr];
+  // Append Summaries per-date at the bottom (conditional)
+  if (includeDailySummaryInExport) {
+    for (const dStr of sortedDates) {
+      const group = groupedByDate[dStr];
 
-    // Date subheader
-    csvRows.push(getCsvSummaryRow(`${dStr} summary`));
+      // Date subheader
+      csvRows.push(getCsvSummaryRow(`${dStr} summary`));
 
-    // Dynamic Summary table header
-    csvRows.push(getCsvSummaryRow('Summary', 'Count'));
+      // Dynamic Summary table header
+      csvRows.push(getCsvSummaryRow('Summary', 'Count'));
 
-    // Counts by event name
-    for (const eName of allEventNames) {
-      const count = group.malEvents[eName] || 0;
-      csvRows.push(getCsvSummaryRow(eName, count));
+      // Counts by event name
+      for (const eName of allEventNames) {
+        const count = group.malEvents[eName] || 0;
+        csvRows.push(getCsvSummaryRow(eName, count));
+      }
+
+      // False Positive
+      csvRows.push(getCsvSummaryRow('False Positive', group.falsePositiveCount));
+
+      // Total
+      const totalCount = group.totalMalicious + group.falsePositiveCount;
+      csvRows.push(getCsvSummaryRow('Total', totalCount));
+
+      // Spacer
+      csvRows.push(getCsvSpacer());
     }
-
-    // False Positive
-    csvRows.push(getCsvSummaryRow('False Positive', group.falsePositiveCount));
-
-    // Total
-    const totalCount = group.totalMalicious + group.falsePositiveCount;
-    csvRows.push(getCsvSummaryRow('Total', totalCount));
-
-    // Spacer
-    csvRows.push(getCsvSpacer());
   }
 
   // Append Grand Total at the bottom
@@ -6234,6 +6482,7 @@ async function handleWeeklyReportUpload(file) {
     let fbCount = 0;
     let maliciousCount = 0;
     const dailyFalsePositives = {};
+    const dailyDetectedEvents = {};
     
     // Check if the sheets contain explicit status classification columns
     let fileHasStatusColumns = false;
@@ -6310,8 +6559,10 @@ async function handleWeeklyReportUpload(file) {
         continue;
       }
       
+      const sName = r._sheetName || 'Daily Report';
       if (isMalicious) {
         maliciousCount++;
+        dailyDetectedEvents[sName] = (dailyDetectedEvents[sName] || 0) + 1;
         // If it matches case-insensitively one of our predefined/existing categories, increment that key
         let foundKey = null;
         for (const key of Object.keys(categoryCounts)) {
@@ -6327,7 +6578,6 @@ async function handleWeeklyReportUpload(file) {
         }
       } else {
         fbCount++;
-        const sName = r._sheetName || 'Daily Report';
         dailyFalsePositives[sName] = (dailyFalsePositives[sName] || 0) + 1;
       }
     }
@@ -6337,7 +6587,8 @@ async function handleWeeklyReportUpload(file) {
       falsePositive: fbCount,
       detected: maliciousCount,
       total: maliciousCount + fbCount,
-      dailyFalsePositives: dailyFalsePositives
+      dailyFalsePositives: dailyFalsePositives,
+      dailyDetectedEvents: dailyDetectedEvents
     };
     window.weeklyRawRows = parsed;
     
@@ -6353,8 +6604,10 @@ async function handleWeeklyReportUpload(file) {
       uploadText.textContent = file.name;
     }
     
+    window.weeklyUploadFileName = file.name;
     renderWeeklyReportPreview();
     toast('Weekly report ready!', 'toast-success');
+    toggleSidebar(true);
   } catch (err) {
     console.error(err);
     toast('Error parsing file: ' + err.message, 'toast-error');
@@ -6363,78 +6616,195 @@ async function handleWeeklyReportUpload(file) {
 function renderWeeklyReportPreview() {
   const data = window.weeklyReportData;
   if (!data) return;
-  const tbody = document.getElementById('weeklyReportTableBody');
-  if (!tbody) return;
+
+  // --- POPULATE THE NEW STANDALONE WEEKLY REPORT PREVIEW CARD (ON THE RIGHT SIDE) ---
+  const overTable = document.getElementById('weeklySystemOverviewTableBody');
+  const overDailyTable = document.getElementById('weeklySystemOverviewDailyTableBody');
+  const overDailyDetectedTable = document.getElementById('weeklySystemOverviewDailyDetectedTableBody');
+  const overTotal = document.getElementById('weeklyTotalCountCard');
+  const overDetected = document.getElementById('weeklyDetectedCountCard');
+  const overFP = document.getElementById('weeklyFalsePositiveCountCard');
+  const overFile = document.getElementById('weeklySystemOverviewFileName');
   
-  let html = '';
-  for (const [name, count] of Object.entries(data.categories)) {
-    if (count === 0) continue;
-    html += `
-      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-        <td style="padding:8px 10px; color:var(--text);">${escapeHtml(name)}</td>
-        <td style="padding:8px 10px; text-align:right; font-family:'JetBrains Mono',monospace; color:var(--text);">${count}</td>
-      </tr>
-    `;
+  if (overTotal) overTotal.textContent = data.total;
+  if (overDetected) overDetected.textContent = data.detected;
+  if (overFP) overFP.textContent = data.falsePositive;
+  if (overFile) {
+    overFile.textContent = window.weeklyUploadFileName || "parsed_report.csv";
   }
-  
-  // Detected (coral-red tint)
-  html += `
-    <tr style="background: rgba(217, 150, 148, 0.25); color: #FF9999; font-weight:700;">
-      <td style="padding:8px 10px; border-top:1px solid rgba(255,255,255,0.1)">Detected</td>
-      <td style="padding:8px 10px; text-align:right; font-family:'JetBrains Mono',monospace; border-top:1px solid rgba(255,255,255,0.1)">${data.detected}</td>
-    </tr>
-  `;
-  
-  // False Positive (yellow-ish tint)
-  html += `
-    <tr style="background: rgba(255, 255, 0, 0.15); color: #FFFF66; font-weight:700;">
-      <td style="padding:8px 10px;">False Positive</td>
-      <td style="padding:8px 10px; text-align:right; font-family:'JetBrains Mono',monospace;">${data.falsePositive}</td>
-    </tr>
-  `;
-  
-  // Render daily false positives breakdown if present
-  if (data.dailyFalsePositives) {
-    for (const [day, count] of Object.entries(data.dailyFalsePositives)) {
-      html += `
-        <tr style="background: rgba(255, 255, 0, 0.05); color: rgba(255, 255, 102, 0.85); font-style: italic;">
-          <td style="padding:6px 10px 6px 24px;">&mdash; ${escapeHtml(day)}</td>
-          <td style="padding:6px 10px; text-align:right; font-family:'JetBrains Mono',monospace;">${count}</td>
-        </tr>
-      `;
+
+  if (overTable) {
+    let tHtml = '';
+    let categoryEntries = Object.entries(data.categories).filter(([_, count]) => count > 0);
+    if (categoryEntries.length === 0) {
+      tHtml = `<tr><td colspan="2" style="padding:12px; text-align:center; color:var(--muted)">No categories found</td></tr>`;
+    } else {
+    categoryEntries.forEach(([name, count]) => {
+        tHtml += `
+          <tr style="background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid var(--border); border-left: 3px solid var(--green);">
+            <td style="padding:8px 12px; color: #4ade80; font-weight: 500;">${escapeHtml(name)}</td>
+            <td style="padding:8px 12px; text-align:right; font-family:'JetBrains Mono',monospace; color: #4ade80; font-weight: 700;">${count}</td>
+          </tr>
+        `;
+      });
     }
+    overTable.innerHTML = tHtml;
   }
-  
-  // Total (emerald-green tint)
-  html += `
-    <tr style="background: rgba(39, 174, 96, 0.25); color: #66FF99; font-weight:700;">
-      <td style="padding:8px 10px;">Total</td>
-      <td style="padding:8px 10px; text-align:right; font-family:'JetBrains Mono',monospace;">${data.total}</td>
-    </tr>
-  `;
-  
-  tbody.innerHTML = html;
-  document.getElementById('weeklyReportPreview').style.display = 'block';
+
+  // Populate Daily Detected table (smooth colors based on count behaviors)
+  if (overDailyDetectedTable) {
+    let dHtml = '';
+    let dailyEntries = Object.entries(data.dailyDetectedEvents || {}).filter(([_, count]) => count > 0);
+    if (dailyEntries.length === 0) {
+      dHtml = `<tr><td colspan="2" style="padding:12px; text-align:center; color:var(--muted)">No detected events recorded</td></tr>`;
+    } else {
+      dailyEntries.forEach(([day, count]) => {
+        let rowBg = '';
+        let rowBorderLeft = '';
+        let textClr = '';
+        if (count >= 10) {
+          // high count: red smooth red background
+          rowBg = 'rgba(239, 68, 68, 0.12)';
+          rowBorderLeft = '3px solid var(--red)';
+          textClr = '#ff9999';
+        } else if (count >= 3) {
+          // medium count: yellow background
+          rowBg = 'rgba(245, 158, 11, 0.12)';
+          rowBorderLeft = '3px solid var(--amber)';
+          textClr = '#fde047';
+        } else {
+          // low count: green background
+          rowBg = 'rgba(16, 185, 129, 0.12)';
+          rowBorderLeft = '3px solid var(--green)';
+          textClr = '#4ade80';
+        }
+        dHtml += `
+          <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border); border-left: ${rowBorderLeft};">
+            <td style="padding:8px 12px; color: #ff9999; font-weight: 500;">${escapeHtml(day)}</td>
+            <td style="padding:8px 12px; text-align:right; font-family:'JetBrains Mono',monospace; color: #ff9999; font-weight: 700;">${count}</td>
+          </tr>
+        `;
+      });
+    }
+    overDailyDetectedTable.innerHTML = dHtml;
+  }
+
+  // Populate Daily False Positives table (smooth colors based on count behaviors)
+  if (overDailyTable) {
+    let dHtml = '';
+    let dailyEntries = Object.entries(data.dailyFalsePositives || {}).filter(([_, count]) => count > 0);
+    if (dailyEntries.length === 0) {
+      dHtml = `<tr><td colspan="2" style="padding:12px; text-align:center; color:var(--muted)">No false positives recorded</td></tr>`;
+    } else {
+      dailyEntries.forEach(([day, count]) => {
+        let rowBg = '';
+        let rowBorderLeft = '';
+        let textClr = '';
+        if (count >= 10) {
+          // high false positives count: yellow/amber background
+          rowBg = 'rgba(245, 158, 11, 0.18)';
+          rowBorderLeft = '3px solid var(--amber)';
+          textClr = '#fde047';
+        } else if (count >= 3) {
+          // medium false positives count: soft yellow background
+          rowBg = 'rgba(245, 158, 11, 0.12)';
+          rowBorderLeft = '3px solid var(--amber)';
+          textClr = '#fde047';
+        } else {
+          // low false positives count: green background
+          rowBg = 'rgba(16, 185, 129, 0.12)';
+          rowBorderLeft = '3px solid var(--green)';
+          textClr = '#4ade80';
+        }
+        dHtml += `
+          <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border); border-left: ${rowBorderLeft};">
+            <td style="padding:8px 12px; color: #fde047; font-weight: 500;">${escapeHtml(day)}</td>
+            <td style="padding:8px 12px; text-align:right; font-family:'JetBrains Mono',monospace; color: #fde047; font-weight: 700;">${count}</td>
+          </tr>
+        `;
+      });
+    }
+    overDailyTable.innerHTML = dHtml;
+  }
+
+  // Show the standalone weekly report preview card on the right side
+  const weeklyReportPreviewCard = document.getElementById('weeklyReportPreviewCard');
+  if (weeklyReportPreviewCard) {
+    weeklyReportPreviewCard.style.display = 'block';
+  }
+
+  // Ensure systemOverviewCard is hidden (as per user request: "hide system overview & filter setup")
+  const systemOverview = document.getElementById('systemOverviewCard');
+  if (systemOverview) {
+    systemOverview.style.display = 'none';
+  }
 }
 function exportWeeklyReport(format) {
   const data = window.weeklyReportData;
   if (!data) { toast('Please upload a file first', 'toast-error'); return; }
   
+  // Check if user wants to include Daily Detected & Daily False Positives
+  const includeDailyEventsCheckbox = document.getElementById('includeDailyEventsInExport');
+  const includeDailyEvents = includeDailyEventsCheckbox ? includeDailyEventsCheckbox.checked : false;
+
+  // Create sheetData list and track row indices for styling
   const sheetData = [];
   sheetData.push(['', 'Summary', 'Count']);
+  
+  // 1. Categories
   for (const [name, count] of Object.entries(data.categories)) {
     if (count === 0) continue;
     sheetData.push(['', name, count]);
   }
-  sheetData.push(['', 'Detected', data.detected]);
-  sheetData.push(['', 'False Positive', data.falsePositive]);
   
+  const categoryRowIndices = [];
+  const detectedRowIndices = [];
+  const detectedDailyRowIndices = [];
+  const fpRowIndices = [];
+  const fpDailyRowIndices = [];
+  const totalRowIndices = [];
+  
+  let currentRowIdx = 3; // Row 1 is blank, Row 2 is Header, Row 3 is start of data
+  
+  let totalCategories = Object.entries(data.categories).filter(([name, count]) => count > 0).length;
+  for (let i = 0; i < totalCategories; i++) {
+    categoryRowIndices.push(currentRowIdx++);
+  }
+  
+  // 2. Detected Main Row
+  sheetData.push(['', 'Detected', data.detected]);
+  const detectedRowIdx = currentRowIdx++;
+  
+  // 3. Daily Detected Breakdowns
+  if (includeDailyEvents) {
+    const dailyDetected = Object.entries(data.dailyDetectedEvents || {}).filter(([_, count]) => count > 0);
+    dailyDetected.forEach(([day, count]) => {
+      sheetData.push(['', `  — ${day}`, count]);
+      detectedDailyRowIndices.push(currentRowIdx++);
+    });
+  }
+  
+  // 4. False Positive Main Row
+  sheetData.push(['', 'False Positive', data.falsePositive]);
+  const fpRowIdx = currentRowIdx++;
+  
+  // 5. Daily False Positives Breakdowns
+  if (includeDailyEvents) {
+    const dailyFP = Object.entries(data.dailyFalsePositives || {}).filter(([_, count]) => count > 0);
+    dailyFP.forEach(([day, count]) => {
+      sheetData.push(['', `  — ${day}`, count]);
+      fpDailyRowIndices.push(currentRowIdx++);
+    });
+  }
+  
+  // 6. Total Row
   sheetData.push(['', 'Total', data.total]);
+  const totalRowIdx = currentRowIdx++;
   
   let dynamicWeeklyFilename = '';
   if (window.weeklyRawRows && window.weeklyRawRows.length > 0) {
     const mapped = window.weeklyRawRows.map(r => ({
-      endTime: r['End Time'] || r['endTime'] || r['Endtime'] || ''
+      endTime: r['End Time'] || r['endTime'] || r['Endtime'] || r['Manager Receipt Time'] || r['managerReceiptTime'] || r['ManagerReceiptTime'] || ''
     }));
     dynamicWeeklyFilename = getExportFileNameOfReport(mapped, 'weekly_report', format);
   } else {
@@ -6442,8 +6812,17 @@ function exportWeeklyReport(format) {
   }
 
   if (format === 'csv') {
-    const csvContent = sheetData.map(r => `,"${String(r[1]).replace(/"/g, '""')}","${r[2]}"`).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const csvRows = [
+      ',,', // Row 1: Blank first row matching Excel's layout
+    ];
+    sheetData.forEach(r => {
+      const colA = '';
+      const colB = String(r[1] ?? '').replace(/"/g, '""');
+      const colC = String(r[2] ?? '').replace(/"/g, '""');
+      csvRows.push(`"${colA}","${colB}","${colC}"`);
+    });
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url;
     a.download = dynamicWeeklyFilename;
@@ -6456,20 +6835,38 @@ function exportWeeklyReport(format) {
         toast('Generating Excel file...');
         const wb = new ExcelJS.Workbook();
         
+        // Load original workbook to preserve styles, fonts, other daily sheets, etc.
         if (window.weeklyOriginalFileBuffer) {
           await wb.xlsx.load(window.weeklyOriginalFileBuffer);
+          
+          // Safeguard: remove existing "Weekly Report" sheet safely if it exists to place it at the very end
           const existingSheet = wb.getWorksheet('Weekly Report');
           if (existingSheet) {
             wb.removeWorksheet(existingSheet.id);
+            // Clear any defined name links to avoid corruption
+            if (wb.definedNames && typeof wb.definedNames.forEach === 'function') {
+              const toRemove = [];
+              wb.definedNames.forEach(dn => {
+                if (dn.ranges && dn.ranges.some(r => r.indexOf('Weekly Report') !== -1)) {
+                  toRemove.push(dn);
+                }
+              });
+              toRemove.forEach(dn => {
+                wb.definedNames.remove(dn.name);
+              });
+            }
           }
         }
         
-        // Add Weekly Report sheet
+        // Ensure wb.views is cleared to prevent active tab sheet index corruption on file opening
+        wb.views = [];
+        
+        // Add "Weekly Report" sheet as the last worksheet tab
         const ws = wb.addWorksheet('Weekly Report', {
           views: [{ showGridLines: true }]
         });
         
-        // Style columns
+        // Style columns only on the Weekly Report sheet
         ws.columns = [
           { width: 5 },  // Column A is empty/narrow spacing
           { width: 55 }, // Column B
@@ -6513,11 +6910,9 @@ function exportWeeklyReport(format) {
           };
         }
         
-        let totalCategories = Object.entries(data.categories).filter(([name, count]) => count > 0).length;
-        let rIdx = 3; // Categories start at Row 3
-        
-        for (let i = 0; i < totalCategories; i++) {
-          const catRow = ws.getRow(rIdx);
+        // Categories rows formatting
+        categoryRowIndices.forEach(idx => {
+          const catRow = ws.getRow(idx);
           for (let colIndex = 2; colIndex <= 3; colIndex++) {
             const cell = catRow.getCell(colIndex);
             cell.font = { name: 'Calibri', size: 11, color: { argb: 'FF000000' } };
@@ -6527,39 +6922,64 @@ function exportWeeklyReport(format) {
               fgColor: { argb: 'FFFFFFFF' }
             };
           }
-          rIdx++;
-        }
+        });
         
-        // Detected row: bold on light pink `#D99694`
-        const detectedRow = ws.getRow(rIdx);
+        // Detected row: bold on smooth light pink/red `#FFCDD2`
+        const detRow = ws.getRow(detectedRowIdx);
         for (let colIndex = 2; colIndex <= 3; colIndex++) {
-          const cell = detectedRow.getCell(colIndex);
+          const cell = detRow.getCell(colIndex);
           cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF000000' } };
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'FFD99694' }
+            fgColor: { argb: 'FFFFCDD2' }
           };
         }
-        rIdx++;
         
-        // False Positive row: bold on yellow `#FFFF00`
-        const fpRow = ws.getRow(rIdx);
+        // Daily Detected breakdowns (Only styled if present in sheetData)
+        detectedDailyRowIndices.forEach(idx => {
+          const dRow = ws.getRow(idx);
+          for (let colIndex = 2; colIndex <= 3; colIndex++) {
+            const cell = dRow.getCell(colIndex);
+            cell.font = { name: 'Calibri', size: 11, italic: true, color: { argb: 'FF555555' } };
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFEBEE' }
+            };
+          }
+        });
+        
+        // False Positive row: bold on smooth yellowish `#FFF9C4`
+        const fRow = ws.getRow(fpRowIdx);
         for (let colIndex = 2; colIndex <= 3; colIndex++) {
-          const cell = fpRow.getCell(colIndex);
+          const cell = fRow.getCell(colIndex);
           cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF000000' } };
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: 'FFFFFF00' }
+            fgColor: { argb: 'FFFFF9C4' }
           };
         }
-        rIdx++;
         
-        // Total row: white bold text on green `#27AE60`
-        const totalRow = ws.getRow(rIdx);
+        // Daily False Positives breakdowns (Only styled if present in sheetData)
+        fpDailyRowIndices.forEach(idx => {
+          const fpDRec = ws.getRow(idx);
+          for (let colIndex = 2; colIndex <= 3; colIndex++) {
+            const cell = fpDRec.getCell(colIndex);
+            cell.font = { name: 'Calibri', size: 11, italic: true, color: { argb: 'FF555555' } };
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FFFFFDE7' }
+            };
+          }
+        });
+        
+        // Total row: white bold text on professional green `#27AE60`
+        const totRow = ws.getRow(totalRowIdx);
         for (let colIndex = 2; colIndex <= 3; colIndex++) {
-          const cell = totalRow.getCell(colIndex);
+          const cell = totRow.getCell(colIndex);
           cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
           cell.fill = {
             type: 'pattern',
@@ -6568,75 +6988,25 @@ function exportWeeklyReport(format) {
           };
         }
         
-        // Auto-fit column widths for all worksheets to prevent clipping and distortion
-        wb.eachSheet((sheet) => {
-          // Explicitly enable grid lines for all sheets
-          sheet.views = [{ showGridLines: true }];
-          
-          if (sheet.name === 'Weekly Report') {
-            // Weekly Report layout
-            sheet.columns.forEach((column, colIdx) => {
-              if (colIdx === 0) { // Column A spacer
-                column.width = 5;
-                return;
-              }
-              let maxLen = 0;
-              column.eachCell({ includeEmpty: false }, (cell) => {
-                const val = cell.value;
-                if (val !== undefined && val !== null) {
-                  const str = String(val);
-                  if (str.length > maxLen) maxLen = str.length;
-                }
-              });
-              column.width = Math.min(65, Math.max(15, maxLen + 5));
-            });
-          } else {
-            // Other worksheets (Daily sheets loaded from original workbook)
-            sheet.columns.forEach((column) => {
-              let maxLen = 0;
-              column.eachCell({ includeEmpty: false }, (cell) => {
-                // Ignore merged cells to prevent banner row title distortion
-                if (cell.isMerged || (cell.master && cell.master !== cell)) {
-                  return;
-                }
-                
-                const val = cell.value;
-                if (val !== undefined && val !== null) {
-                  let strVal = '';
-                  if (typeof val === 'object') {
-                    if (val.richText) {
-                      strVal = val.richText.map(t => t.text || '').join('');
-                    } else if (val.text) {
-                      strVal = val.text;
-                    } else if (val.result !== undefined) {
-                      strVal = String(val.result);
-                    } else {
-                      strVal = String(val);
-                    }
-                  } else {
-                    strVal = String(val);
-                  }
-                  
-                  // Ignore paragraph-length comments or huge JSON logs to avoid huge columns
-                  if (strVal.length < 80) {
-                    const lines = strVal.split('\n');
-                    for (const line of lines) {
-                      if (line.length > maxLen) {
-                        maxLen = line.length;
-                      }
-                    }
-                  }
-                }
-              });
-              
-              if (maxLen > 0) {
-                column.width = Math.min(60, Math.max(12, maxLen + 4));
-              } else {
-                column.width = 12;
-              }
-            });
+        // Auto-fit column widths ONLY for the 'Weekly Report' worksheet to prevent clipping
+        const colCount = ws.columnCount;
+        for (let i = 1; i <= colCount; i++) {
+          const column = ws.getColumn(i);
+          const colIdx = i - 1; // 0-indexed for spacer matching
+          if (colIdx === 0) { // Column A spacer
+            column.width = 5;
+            continue;
           }
-        });
+          let maxLen = 0;
+          column.eachCell({ includeEmpty: false }, (cell) => {
+            const val = cell.value;
+            if (val !== undefined && val !== null) {
+              const str = String(val);
+              if (str.length > maxLen) maxLen = str.length;
+            }
+          });
+          column.width = Math.min(65, Math.max(15, maxLen + 5));
+        }
 
         // Save the file
         const bufferOut = await wb.xlsx.writeBuffer();
@@ -6688,7 +7058,7 @@ async function initAuth() {
       abuseThreshold: 30,
       skipAbuseIfVTEnabled: true,
       allowedVendors: ['apache', 'Cisco ISE', 'firewall'],
-      excludedIPs: ['10']
+      excludedIPs: ['10', '127']
     };
     localStorage.setItem('analyst_users', JSON.stringify(users));
   }
@@ -6732,7 +7102,7 @@ function syncUserToServer(userObj) {
 function showAuthScreen() {
   document.getElementById('authContainer').style.display = 'flex';
   document.getElementById('mainAppContainer').style.display = 'none';
-  switchAuthTab('signin');
+  switchAuthTab('keyfile');
 }
 
 function showDashboard() {
@@ -7044,7 +7414,7 @@ async function verifyAndLoginWithKeys(vtKey, abuseKey) {
         abuseThreshold: 30,
         skipAbuseIfVTEnabled: true,
         allowedVendors: ['apache', 'Cisco ISE', 'firewall'],
-        excludedIPs: ['10']
+        excludedIPs: ['10', '127']
       };
       
       let users = JSON.parse(localStorage.getItem('analyst_users') || '{}');
@@ -7174,7 +7544,7 @@ function registerAnalyst(e) {
     abuseThreshold: 30,
     skipAbuseIfVTEnabled: true,
     allowedVendors: ['apache', 'Cisco ISE', 'firewall'],
-    excludedIPs: ['10']
+    excludedIPs: ['10', '127']
   };
   
   users[userInp] = newUser;
