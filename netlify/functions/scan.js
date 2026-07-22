@@ -1,7 +1,7 @@
 const https = require("https");
 
 // ── DEFAULT API KEY FALLBACK ──
-const DEFAULT_VT_API_KEY = "96cbdd43beeb6dbe81302b11c27ff5d4d2acd9e5bd9126e258b4abe64e2ac38d";
+const DEFAULT_VT_API_KEY = "415e00b75c5197f5e7fee7a162eb1d6b3296eeb86b73a2e9f01ab340f6ddf24a";
 
 function fetchVT(ip, apiKey) {
   return new Promise((resolve) => {
@@ -9,7 +9,11 @@ function fetchVT(ip, apiKey) {
       hostname: "www.virustotal.com",
       path: `/api/v3/ip_addresses/${encodeURIComponent(ip)}`,
       method: "GET",
-      headers: { "x-apikey": apiKey, Accept: "application/json" },
+      headers: {
+        "x-apikey": apiKey,
+        "Accept": "application/json",
+        "User-Agent": "IP-Scanner/1.0"
+      },
     };
     const req = https.request(options, (res) => {
       let body = "";
@@ -87,28 +91,28 @@ exports.handler = async (event) => {
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
-  const ip = event.queryStringParameters?.ip || "";
-  const queryKey = (event.queryStringParameters?.key || "").trim();
-  const apiKey = queryKey || process.env.VT_API_KEY || DEFAULT_VT_API_KEY;
-
-  if (!ip) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: "Missing ip parameter" }),
-    };
-  }
-
-  const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-  if (!ipRegex.test(ip.trim())) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: "Invalid IP format" }),
-    };
-  }
-
   try {
+    const ip = event.queryStringParameters?.ip || "";
+    const queryKey = (event.queryStringParameters?.key || "").trim();
+    const apiKey = queryKey || process.env.VT_API_KEY || DEFAULT_VT_API_KEY;
+
+    if (!ip) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: "Missing ip parameter" }),
+      };
+    }
+
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip.trim())) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: "Invalid IP format" }),
+      };
+    }
+
     const result = await fetchVT(ip.trim(), apiKey);
     return {
       statusCode: 200,

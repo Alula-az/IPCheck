@@ -10,7 +10,8 @@ function fetchAbuseIPDB(ip, apiKey) {
       method: "GET",
       headers: {
         "Key": apiKey,
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "User-Agent": "IP-Scanner/1.0"
       },
     };
     const req = https.request(options, (res) => {
@@ -54,28 +55,28 @@ exports.handler = async (event) => {
     "Access-Control-Allow-Headers": "Content-Type",
   };
 
-  const ip = event.queryStringParameters?.ip || "";
-  const queryKey = (event.queryStringParameters?.key || "").trim();
-  const apiKey = queryKey || process.env.ABUSE_API_KEY || DEFAULT_ABUSE_API_KEY;
-
-  if (!ip) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: "Missing ip parameter" }),
-    };
-  }
-
-  const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-  if (!ipRegex.test(ip.trim())) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: "Invalid IP format" }),
-    };
-  }
-
   try {
+    const ip = event.queryStringParameters?.ip || "";
+    const queryKey = (event.queryStringParameters?.key || "").trim();
+    const apiKey = queryKey || process.env.ABUSE_API_KEY || DEFAULT_ABUSE_API_KEY;
+
+    if (!ip) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: "Missing ip parameter" }),
+      };
+    }
+
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip.trim())) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ error: "Invalid IP format" }),
+      };
+    }
+
     const result = await fetchAbuseIPDB(ip.trim(), apiKey);
     return {
       statusCode: 200,

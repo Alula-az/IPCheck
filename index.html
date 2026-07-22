@@ -2854,7 +2854,6 @@ tbody tr:hover .copy-ip-btn {
     
     <div class="auth-tabs">
       <button class="auth-tab-btn" id="authTabBtnSignin" onclick="switchAuthTab('signin')">Sign In</button>
-      <button class="auth-tab-btn" id="authTabBtnRegister" onclick="switchAuthTab('register')">Register</button>
       <button class="auth-tab-btn active" id="authTabBtnKeyFile" onclick="switchAuthTab('keyfile')">API Key File (.txt)</button>
     </div>
 
@@ -2881,40 +2880,6 @@ tbody tr:hover .copy-ip-btn {
       <button type="submit" class="auth-btn">
         <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Sign In to Hub
-      </button>
-    </form>
-
-    <!-- REGISTER FORM -->
-    <form id="authFormRegister" onsubmit="registerAnalyst(event)" style="display:none; flex-direction:column; gap:1.25rem;">
-      <div class="auth-form-group">
-        <label for="registerName">Name</label>
-        <div class="auth-input-wrap">
-          <input type="text" id="registerName" placeholder="e.g. Inspector John" required autocomplete="name">
-        </div>
-      </div>
-      <div class="auth-form-group">
-        <label for="registerPassword">Password</label>
-        <div class="auth-input-wrap">
-          <input type="password" id="registerPassword" placeholder="Min. 4 characters" required autocomplete="new-password">
-        </div>
-      </div>
-      <div class="auth-form-group">
-        <label for="registerApiKey">VirusTotal API Key (Optional)</label>
-        <div class="auth-input-wrap">
-          <input type="password" id="registerApiKey" placeholder="Paste custom key format">
-        </div>
-        <p style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;line-height:1.4;">Leave blank to use embedded default key.</p>
-      </div>
-      <div class="auth-form-group">
-        <label for="registerAbuseApiKey">AbuseIPDB API Key (Optional)</label>
-        <div class="auth-input-wrap">
-          <input type="password" id="registerAbuseApiKey" placeholder="Paste custom key format">
-        </div>
-        <p style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;line-height:1.4;">Leave blank to use embedded default key.</p>
-      </div>
-      <button type="submit" class="auth-btn">
-        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
-        Register Account
       </button>
     </form>
 
@@ -3692,9 +3657,25 @@ tbody tr:hover .copy-ip-btn {
       <div class="progress-text" id="progressText" style="margin-top: 14px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--text); display: flex; align-items: center; gap: 8px;">Ready to scan</div>
       <div class="progress-meta" id="progressMeta" style="margin-top: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted);"></div>
       <!-- Rate limit notice -->
-      <div class="rate-limit-notice" id="rateLimitNotice" style="margin-top: 12px; font-family: 'JetBrains Mono', monospace;">
-        <div class="rate-limit-dot"></div>
-        <span id="rateLimitMsg">Rate limited — auto-retrying in <span id="rateLimitCountdown">15</span>s...</span>
+      <div class="rate-limit-notice" id="rateLimitNotice" style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="rate-limit-dot"></div>
+          <span id="rateLimitMsg">Rate limited on current API key — auto-retrying in <span id="rateLimitCountdown">15</span>s...</span>
+        </div>
+        <button onclick="openSettingsModal()" style="background: rgba(255, 171, 0, 0.15); border: 1px solid rgba(255, 171, 0, 0.3); color: #ffab00; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; cursor: pointer;">
+          ⚙️ Change API Key in Settings
+        </button>
+      </div>
+
+      <!-- API Key Error / Quota Notice -->
+      <div id="apiKeyErrorNotice" style="display:none; margin-top: 12px; padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #f87171; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        <div style="display:flex; align-items:center; gap:8px; flex:1; min-width: 220px;">
+          <span style="font-size:14px;">⚠️</span>
+          <span id="apiKeyErrorMsg" style="line-height:1.4;">API key rate limit reached or key invalid.</span>
+        </div>
+        <button onclick="openSettingsModal()" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #fff; padding: 5px 12px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight:600; cursor: pointer; white-space:nowrap;">
+          ⚙️ Change API Key in Settings
+        </button>
       </div>
     </div>
     
@@ -4071,6 +4052,37 @@ function copyKeyValue(inputId, keyName) {
     .catch(() => toast('Failed to copy to clipboard', 'toast-error'));
 }
 
+function explainApiKeyError(service, errStr) {
+  const s = String(errStr || '');
+  const lower = s.toLowerCase();
+  
+  if (lower.includes('rate_limited') || lower.includes('429') || lower.includes('quota') || lower.includes('limit')) {
+    return `${service} Rate Limit / Quota Exceeded (HTTP 429). Public/current key limit reached. Please change or update your ${service} API key in Settings.`;
+  }
+  if (lower.includes('401') || lower.includes('403') || lower.includes('wrong api key') || lower.includes('unauthorized') || lower.includes('invalid key') || lower.includes('authentication')) {
+    return `${service} API Key Invalid / Unauthorized (HTTP 401/403). Key rejected by ${service}. Please check or update your key in Settings.`;
+  }
+  if (lower.includes('502') || lower.includes('bad gateway') || lower.includes('500') || lower.includes('503')) {
+    return `${service} Service Connection Error (HTTP 502). ${service} upstream service is temporarily failing or blocking queries. Update your API key in Settings or try again later.`;
+  }
+  return `${service} returned error (${s}). Please update or change your API key in Settings.`;
+}
+
+function showApiKeyErrorNotice(serviceName, errorStr) {
+  const noticeEl = document.getElementById('apiKeyErrorNotice');
+  const msgEl = document.getElementById('apiKeyErrorMsg');
+  if (noticeEl && msgEl) {
+    const explanation = explainApiKeyError(serviceName, errorStr);
+    msgEl.innerHTML = `<strong>${escapeHtml(serviceName)} Alert:</strong> ${escapeHtml(explanation)}`;
+    noticeEl.style.display = 'flex';
+  }
+}
+
+function hideApiKeyErrorNotice() {
+  const noticeEl = document.getElementById('apiKeyErrorNotice');
+  if (noticeEl) noticeEl.style.display = 'none';
+}
+
 async function validateKeyDirect(service) {
   const isVt = service === 'vt';
   const statusEl = document.getElementById(isVt ? 'vtValidationStatus' : 'abuseValidationStatus');
@@ -4085,23 +4097,24 @@ async function validateKeyDirect(service) {
   statusTextSpan.style.color = 'var(--cyan)';
 
   const key = document.getElementById(isVt ? 'apikeyInput' : 'abuseApikeyInput').value.trim();
+  const serviceName = isVt ? 'VirusTotal' : 'AbuseIPDB';
   
   try {
     let url;
     if (isVt) {
       url = key 
-        ? `/.netlify/functions/scan?ip=8.8.8.8&key=${encodeURIComponent(key)}`
-        : `/.netlify/functions/scan?ip=8.8.8.8`;
+        ? `/api/scan?ip=8.8.8.8&key=${encodeURIComponent(key)}`
+        : `/api/scan?ip=8.8.8.8`;
     } else {
       url = key
-        ? `/.netlify/functions/abuseipdb?ip=8.8.8.8&key=${encodeURIComponent(key)}`
-        : `/.netlify/functions/abuseipdb?ip=8.8.8.8`;
+        ? `/api/abuseipdb/scan?ip=8.8.8.8&key=${encodeURIComponent(key)}`
+        : `/api/abuseipdb/scan?ip=8.8.8.8`;
     }
 
     const res = await fetch(url);
     if (!res.ok) {
-      const errText = `HTTP ${res.status}`;
-      statusTextSpan.innerHTML = `✗ Not Valid: ${errText}`;
+      const explanation = explainApiKeyError(serviceName, `HTTP ${res.status}`);
+      statusTextSpan.innerHTML = `✗ Not Valid: ${explanation}`;
       statusTextSpan.style.color = 'var(--red)';
       if (btn) btn.disabled = false;
       return false;
@@ -4109,18 +4122,20 @@ async function validateKeyDirect(service) {
 
     const data = await res.json();
     if (data.error) {
-      statusTextSpan.innerHTML = `✗ Not Valid: ${data.error}`;
+      const explanation = explainApiKeyError(serviceName, data.error);
+      statusTextSpan.innerHTML = `✗ Not Valid: ${explanation}`;
       statusTextSpan.style.color = 'var(--red)';
       if (btn) btn.disabled = false;
       return false;
     } else {
-      statusTextSpan.innerHTML = `✓ Valid (Working)`;
+      statusTextSpan.innerHTML = `✓ Valid (${serviceName} Ready)`;
       statusTextSpan.style.color = 'var(--green)';
       if (btn) btn.disabled = false;
       return true;
     }
   } catch (err) {
-    statusTextSpan.innerHTML = `✗ Not Valid: ${err.message || err}`;
+    const explanation = explainApiKeyError(serviceName, err.message || err);
+    statusTextSpan.innerHTML = `✗ Not Valid: ${explanation}`;
     statusTextSpan.style.color = 'var(--red)';
     if (btn) btn.disabled = false;
     return false;
@@ -5357,8 +5372,8 @@ async function checkVTIP(ip) {
   const customKey = getApiKey();
   try {
     const url = customKey
-      ? `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
-      : `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}`;
+      ? `/api/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
+      : `/api/scan?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
     if (!res.ok) return { error: `HTTP ${res.status}` };
     const data = await res.json();
@@ -5371,8 +5386,8 @@ async function checkAbuseIPDB(ip) {
   const customKey = getAbuseApiKey();
   try {
     const url = customKey
-      ? `/.netlify/functions/abuseipdb?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
-      : `/.netlify/functions/abuseipdb?ip=${encodeURIComponent(ip)}`;
+      ? `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
+      : `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
     if (!res.ok) return { error: `HTTP ${res.status}` };
     const data = await res.json();
@@ -5382,6 +5397,8 @@ async function checkAbuseIPDB(ip) {
 
 async function startScan() {
   if (isScanning || !filteredData.length) return;
+
+  hideApiKeyErrorNotice();
 
   // Collapse left panel on desktop so results show next to it
   toggleSidebar(true);
@@ -5440,6 +5457,7 @@ async function startScan() {
     // Auto-retry on rate limit
     if (r.error === 'RATE_LIMITED') {
       rateLimited++;
+      showApiKeyErrorNotice('VirusTotal', 'RATE_LIMITED');
       const notice = document.getElementById('rateLimitNotice');
       notice.classList.add('visible');
       const cdEl = document.getElementById('rateLimitCountdown');
@@ -5451,11 +5469,13 @@ async function startScan() {
       notice.classList.remove('visible');
       if (!shouldStop) r = await checkVTIP(ip); // retry once
       if (r.error) errors++;
+    } else if (r.error) {
+      errors++;
+      showApiKeyErrorNotice('VirusTotal', r.error);
     }
 
     vtResults.set(ip, r);
     if (r.fromCache) cached++;
-    if (r.error && r.error !== 'RATE_LIMITED') errors++;
 
     // Check AbuseIPDB for all IPs
     if (r.abuseScore === undefined || r.abuseScore === null) {
@@ -5474,6 +5494,9 @@ async function startScan() {
           setCache(ip, r);
         } else {
           r.abuseScore = null;
+          if (abuseRes && abuseRes.error) {
+            showApiKeyErrorNotice('AbuseIPDB', abuseRes.error);
+          }
         }
         // Timing like VT
         if (!r.fromCache && !shouldStop) {
@@ -7079,31 +7102,27 @@ async function initAuth() {
     localStorage.setItem('analyst_users', JSON.stringify(users));
   }
 
-  // Check active session
+  // Check active session or set default active Chief Analyst session
   const activeSessionStr = localStorage.getItem('current_analyst_user');
   if (activeSessionStr) {
     currentUser = JSON.parse(activeSessionStr);
-    showDashboard();
   } else {
-    showAuthScreen();
-    // Pre-fill remembered username/name if available
-    const rememberedUser = localStorage.getItem('remembered_analyst_user');
-    const rememberedPass = localStorage.getItem('remembered_analyst_pass');
-    if (rememberedUser) {
-      setTimeout(() => {
-        const signinUsername = document.getElementById('signinUsername');
-        if (signinUsername) signinUsername.value = rememberedUser;
-        const rememberCheckbox = document.getElementById('rememberMeCheckbox');
-        if (rememberCheckbox) rememberCheckbox.checked = true;
-      }, 50);
-    }
-    if (rememberedPass) {
-      setTimeout(() => {
-        const signinPassword = document.getElementById('signinPassword');
-        if (signinPassword) signinPassword.value = rememberedPass;
-      }, 50);
-    }
+    // Auto-login default Chief Analyst session with embedded keys by default
+    currentUser = {
+      username: 'admin',
+      password: 'admin',
+      name: 'Chief Analyst',
+      apiKey: '',
+      abuseApiKey: '',
+      threshold: 3,
+      abuseThreshold: 30,
+      skipAbuseIfVTEnabled: true,
+      allowedVendors: ['apache', 'Cisco ISE', 'firewall'],
+      excludedIPs: ['10', '127']
+    };
+    localStorage.setItem('current_analyst_user', JSON.stringify(currentUser));
   }
+  showDashboard();
 }
 
 function syncUserToServer(userObj) {
@@ -7118,7 +7137,7 @@ function syncUserToServer(userObj) {
 function showAuthScreen() {
   document.getElementById('authContainer').style.display = 'flex';
   document.getElementById('mainAppContainer').style.display = 'none';
-  switchAuthTab('keyfile');
+  switchAuthTab('signin');
 }
 
 function showDashboard() {
@@ -7153,23 +7172,19 @@ function showDashboard() {
 
 function switchAuthTab(tab) {
   const signinForm = document.getElementById('authFormSignin');
-  const registerForm = document.getElementById('authFormRegister');
   const keyfileForm = document.getElementById('authFormKeyFile');
   
   const tabSignin = document.getElementById('authTabBtnSignin');
-  const tabRegister = document.getElementById('authTabBtnRegister');
   const tabKeyFile = document.getElementById('authTabBtnKeyFile');
   
   const errMsg = document.getElementById('authError');
   
   // Hide all forms first
   if (signinForm) signinForm.style.display = 'none';
-  if (registerForm) registerForm.style.display = 'none';
   if (keyfileForm) keyfileForm.style.display = 'none';
   
   // Remove active state from all tabs
   if (tabSignin) tabSignin.classList.remove('active');
-  if (tabRegister) tabRegister.classList.remove('active');
   if (tabKeyFile) tabKeyFile.classList.remove('active');
   
   // Clear file feedback and loading
@@ -7183,9 +7198,6 @@ function switchAuthTab(tab) {
   if (tab === 'signin') {
     if (signinForm) signinForm.style.display = 'flex';
     if (tabSignin) tabSignin.classList.add('active');
-  } else if (tab === 'register') {
-    if (registerForm) registerForm.style.display = 'flex';
-    if (tabRegister) tabRegister.classList.add('active');
   } else if (tab === 'keyfile') {
     if (keyfileForm) keyfileForm.style.display = 'flex';
     if (tabKeyFile) tabKeyFile.classList.add('active');
@@ -7372,7 +7384,7 @@ async function verifyAndLoginWithKeys(vtKey, abuseKey) {
   // Verify VT key if provided
   if (vtKey) {
     try {
-      const url = `/.netlify/functions/scan?ip=8.8.8.8&key=${encodeURIComponent(vtKey)}`;
+      const url = `/api/scan?ip=8.8.8.8&key=${encodeURIComponent(vtKey)}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
@@ -7394,7 +7406,7 @@ async function verifyAndLoginWithKeys(vtKey, abuseKey) {
   // Verify AbuseIPDB key if provided
   if (abuseKey) {
     try {
-      const url = `/.netlify/functions/abuseipdb?ip=8.8.8.8&key=${encodeURIComponent(abuseKey)}`;
+      const url = `/api/abuseipdb/scan?ip=8.8.8.8&key=${encodeURIComponent(abuseKey)}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();

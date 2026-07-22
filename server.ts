@@ -69,7 +69,7 @@ app.post("/api/auth/register", (req, res) => {
   }
 });
 
-const DEFAULT_VT_API_KEY = "96cbdd43beeb6dbe81302b11c27ff5d4d2acd9e5bd9126e258b4abe64e2ac38d";
+const DEFAULT_VT_API_KEY = "415e00b75c5197f5e7fee7a162eb1d6b3296eeb86b73a2e9f01ab340f6ddf24a";
 
 // Lazy initialization of the GoogleGenAI SDK to avoid application crash if API key is not present on startup.
 let aiClient: GoogleGenAI | null = null;
