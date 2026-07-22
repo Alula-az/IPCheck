@@ -2,3 +2,33 @@
   command = "npm run build"
   functions = "netlify/functions"
   publish = "dist"
+
+[[redirects]]
+  from = "/api/scan"
+  to = "/.netlify/functions/scan"
+  status = 200
+
+[[redirects]]
+  from = "/api/abuseipdb/scan"
+  to = "/.netlify/functions/abuseipdb"
+  status = 200
+
+[[redirects]]
+  from = "/api/gemini/chat"
+  to = "/.netlify/functions/gemini-chat"
+  status = 200
+
+[[redirects]]
+  from = "/api/gemini/analyze"
+  to = "/.netlify/functions/gemini-analyze"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/*"
+  to = "/.netlify/functions/auth"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

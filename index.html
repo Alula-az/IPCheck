@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<script>
+  (function() {
+    try {
+      var origFetch = window.fetch;
+      var _fetch = origFetch;
+      Object.defineProperty(window, 'fetch', {
+        get: function() { return _fetch; },
+        set: function(v) { if (typeof v === 'function') { _fetch = v; } },
+        configurable: true,
+        enumerable: true
+      });
+    } catch (e) {}
+  })();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -4080,8 +4094,8 @@ async function validateKeyDirect(service) {
         : `/.netlify/functions/scan?ip=8.8.8.8`;
     } else {
       url = key
-        ? `/api/abuseipdb/scan?ip=8.8.8.8&key=${encodeURIComponent(key)}`
-        : `/api/abuseipdb/scan?ip=8.8.8.8`;
+        ? `/.netlify/functions/abuseipdb?ip=8.8.8.8&key=${encodeURIComponent(key)}`
+        : `/.netlify/functions/abuseipdb?ip=8.8.8.8`;
     }
 
     const res = await fetch(url);
@@ -5346,22 +5360,24 @@ async function checkVTIP(ip) {
       ? `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
       : `/.netlify/functions/scan?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
+    if (!res.ok) return { error: `HTTP ${res.status}` };
     const data = await res.json();
-    if (!data.error) setCache(ip, data);
+    if (data && !data.error && data.pct !== undefined) setCache(ip, data);
     return data;
-  } catch (e) { return { error: e.message }; }
+  } catch (e) { return { error: e.message || 'Fetch failed' }; }
 }
 
 async function checkAbuseIPDB(ip) {
   const customKey = getAbuseApiKey();
   try {
     const url = customKey
-      ? `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
-      : `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}`;
+      ? `/.netlify/functions/abuseipdb?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
+      : `/.netlify/functions/abuseipdb?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
+    if (!res.ok) return { error: `HTTP ${res.status}` };
     const data = await res.json();
     return data;
-  } catch (e) { return { error: e.message }; }
+  } catch (e) { return { error: e.message || 'Fetch failed' }; }
 }
 
 async function startScan() {
@@ -5596,7 +5612,7 @@ function renderTable() {
     // Dynamic Country Filter check
     if (countryFilter !== 'all' && fullCountry !== countryFilter) continue;
 
-    const vtPct = vt && !vt.error 
+    const vtPct = vt && !vt.error && vt.pct !== undefined && vt.pct !== null
       ? (vt.total !== undefined && vt.total > 0 ? `${vt.malicious}/${vt.total} (${vt.pct}%)` : `${vt.pct}%`)
       : (vt?.error ? '—' : '...');
       
@@ -5826,8 +5842,8 @@ function getExportRows() {
     eventCount.set(eventName, (eventCount.get(eventName) || 0) + 1);
     if (isMalicious) maliciousCount++; else falsePositiveCount++;
 
-    const vtPctToExport = vt && !vt.error 
-      ? (vt.total !== undefined && vt.total > 0 ? `${vt.pct}%` : `${vt.pct}%`)
+    const vtPctToExport = vt && !vt.error && vt.pct !== undefined && vt.pct !== null
+      ? `${vt.pct}%`
       : (vt?.error ? 'Error' : '—');
 
     let abusePctToExport = '—';
@@ -7378,7 +7394,7 @@ async function verifyAndLoginWithKeys(vtKey, abuseKey) {
   // Verify AbuseIPDB key if provided
   if (abuseKey) {
     try {
-      const url = `/api/abuseipdb/scan?ip=8.8.8.8&key=${encodeURIComponent(abuseKey)}`;
+      const url = `/.netlify/functions/abuseipdb?ip=8.8.8.8&key=${encodeURIComponent(abuseKey)}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();

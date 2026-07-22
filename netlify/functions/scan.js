@@ -1,7 +1,7 @@
 const https = require("https");
 
-// ── HARDCODED API KEY (No environment variable needed) ──
-const VT_API_KEY = "96cbdd43beeb6dbe81302b11c27ff5d4d2acd9e5bd9126e258b4abe64e2ac38d";
+// ── DEFAULT API KEY FALLBACK ──
+const DEFAULT_VT_API_KEY = "96cbdd43beeb6dbe81302b11c27ff5d4d2acd9e5bd9126e258b4abe64e2ac38d";
 
 function fetchVT(ip, apiKey) {
   return new Promise((resolve) => {
@@ -23,7 +23,10 @@ function fetchVT(ip, apiKey) {
           if (res.statusCode !== 200) {
             return resolve({ error: data?.error?.message || `HTTP ${res.statusCode}` });
           }
-          const attr = data.data.attributes;
+          const attr = data?.data?.attributes;
+          if (!attr) {
+            return resolve({ error: "Invalid response from VirusTotal" });
+          }
           const stats = attr.last_analysis_stats || {};
           const results = attr.last_analysis_results || {};
           const total =
@@ -38,7 +41,6 @@ function fetchVT(ip, apiKey) {
           const votes = attr.total_votes || {};
           const community = (votes.harmless || 0) - (votes.malicious || 0);
 
-          // Collect malicious vendor names for detail modal
           const maliciousVendors = Object.entries(results)
             .filter(([, v]) => v.category === "malicious")
             .map(([name]) => name)
@@ -69,40 +71,55 @@ function fetchVT(ip, apiKey) {
         }
       });
     });
-    req.on("error", (e) => resolve({ error: e.message }));
-    req.setTimeout(15000, () => {
+    req.on("error", (e) => resolve({ error: e.message || "Network error" }));
+    req.setTimeout(8000, () => {
       req.destroy();
-      resolve({ error: "Timeout" });
+      resolve({ error: "Timeout connecting to VirusTotal API" });
     });
     req.end();
   });
 }
 
 exports.handler = async (event) => {
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   const ip = event.queryStringParameters?.ip || "";
+  const queryKey = (event.queryStringParameters?.key || "").trim();
+  const apiKey = queryKey || process.env.VT_API_KEY || DEFAULT_VT_API_KEY;
 
   if (!ip) {
     return {
       statusCode: 400,
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ error: "Missing ip parameter" }),
     };
   }
 
-  // Basic IP format validation before hitting VT
   const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
   if (!ipRegex.test(ip.trim())) {
     return {
       statusCode: 400,
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ error: "Invalid IP format" }),
     };
   }
 
-  const result = await fetchVT(ip.trim(), VT_API_KEY);
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(result),
-  };
+  try {
+    const result = await fetchVT(ip.trim(), apiKey);
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify(result),
+    };
+  } catch (err) {
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ error: err.message || "Server error" }),
+    };
+  }
 };
