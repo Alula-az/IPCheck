@@ -15,7 +15,7 @@ exports.handler = async (event) => {
         admin: {
           username: "admin",
           password: "admin",
-          name: "Chief Analyst",
+          name: "SOC Analyst",
           apiKey: "",
           abuseApiKey: "",
           threshold: 3,

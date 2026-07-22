@@ -2834,6 +2834,230 @@ tbody tr:hover .copy-ip-btn {
 .analytics-grid-row .chart-canvas-wrap {
   height: 140px !important;
 }
+
+/* ── COMPREHENSIVE RESPONSIVE CROSS-DEVICE ADAPTATION ── */
+
+/* Tablet & Medium Devices (< 1024px) */
+@media (max-width: 1023px) {
+  .wrap {
+    padding: 0 0.75rem;
+  }
+  
+  .hdr {
+    padding: 0.75rem 1.25rem;
+    gap: 12px;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .stats {
+    gap: 0.5rem;
+  }
+  
+  .stat-card {
+    min-width: 100px;
+    padding: 0.6rem 0.4rem;
+  }
+  
+  .stat-value {
+    font-size: 1.35rem;
+  }
+
+  .analytics-grid-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile Devices & Small Tablets (< 768px) */
+@media (max-width: 767px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .hdr {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .hdr-left {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .hdr-title h1 {
+    font-size: 1.15rem;
+  }
+
+  .hdr-title p {
+    font-size: 9.5px;
+  }
+
+  .hdr-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .hdr-actions .icon-btn {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    padding: 0 10px;
+    font-size: 11.5px;
+    height: 38px;
+    white-space: nowrap;
+  }
+
+  .app-layout {
+    padding: 0.75rem !important;
+    gap: 1rem !important;
+  }
+
+  .card {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .dropzone {
+    padding: 1.25rem 0.75rem !important;
+  }
+
+  .dropzone-title {
+    font-size: 13px !important;
+  }
+
+  .results-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filter-btns {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-btns::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .ip-search-wrap {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+
+  #tableResizeBtn {
+    margin-left: 0 !important;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .table-container {
+    max-height: 380px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 620px;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  /* Modals on Mobile */
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal, .apikey-modal {
+    padding: 1.25rem !important;
+    max-width: 100% !important;
+    border-radius: 12px !important;
+    max-height: 90vh;
+  }
+
+  .modal-ip {
+    font-size: 1.15rem;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .modal-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .auth-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 12px;
+    max-width: 100%;
+  }
+
+  /* AI Copilot Responsive Floating Drawer */
+  .copilot-launcher {
+    bottom: 16px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .copilot-window {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 72px;
+    height: 75vh;
+    max-height: 520px;
+  }
+}
+
+/* Extra Small Mobile Devices (< 420px) */
+@media (max-width: 419px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hdr-actions .icon-btn {
+    font-size: 10.5px;
+    padding: 0 6px;
+  }
+}
+
+/* Touch Device Optimization */
+@media (hover: none) and (pointer: coarse) {
+  button, select, input, .filter-btn, .icon-btn {
+    min-height: 38px;
+  }
+}
 </style>
 </head>
 <body>
@@ -2864,7 +3088,7 @@ tbody tr:hover .copy-ip-btn {
       <div class="auth-form-group">
         <label for="signinUsername">Name</label>
         <div class="auth-input-wrap">
-          <input type="text" id="signinUsername" placeholder="e.g. Chief Analyst" required autocomplete="username">
+          <input type="text" id="signinUsername" placeholder="e.g. SOC Analyst" required autocomplete="username">
         </div>
       </div>
       <div class="auth-form-group">
@@ -2982,16 +3206,7 @@ tbody tr:hover .copy-ip-btn {
       <div class="collapsed-view-content" style="padding: 1rem 0; justify-content: flex-start;">
         <div class="collapsed-top-icons" style="width: 100%;">
           
-          <!-- Item 1: User Profile -->
-          <div class="collapsed-icon-btn" title="User Profile" onclick="selectSectionFromCollapsed('userProfile', event)">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span id="collapsedProfileName" style="font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.02em; text-align: center; display: block; line-height: 1.1; max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Profile</span>
-          </div>
-
-          <!-- Item 2: Log Ingestion -->
+          <!-- Item 1: Log Ingestion -->
           <div class="collapsed-icon-btn glow-cyan" title="Log Ingestion" onclick="selectSectionFromCollapsed('accLogIngestion', event)">
             <svg viewBox="0 0 24 24" width="19" height="19" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -3001,7 +3216,7 @@ tbody tr:hover .copy-ip-btn {
             <span style="font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.02em; text-align: center; display: block; line-height: 1.1;">Ingest</span>
           </div>
 
-          <!-- Item 3: Flag Thresholds -->
+          <!-- Item 2: Flag Thresholds -->
           <div class="collapsed-icon-btn" title="Flag Thresholds" onclick="selectSectionFromCollapsed('accFlagThresholds', event)">
             <svg viewBox="0 0 24 24" width="19" height="19" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
@@ -3010,7 +3225,7 @@ tbody tr:hover .copy-ip-btn {
             <span style="font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.02em; text-align: center; display: block; line-height: 1.1;">Flags</span>
           </div>
 
-          <!-- Item 4: Secured Vendors -->
+          <!-- Item 3: Secured Vendors -->
           <div class="collapsed-icon-btn" title="Secured Vendors" onclick="selectSectionFromCollapsed('accSecuredVendors', event)">
             <svg viewBox="0 0 24 24" width="19" height="19" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -3018,7 +3233,7 @@ tbody tr:hover .copy-ip-btn {
             <span style="font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 600; text-transform: uppercase; margin-top: 4px; letter-spacing: 0.02em; text-align: center; display: block; line-height: 1.1;">Vendors</span>
           </div>
 
-          <!-- Item 5: Excluded IP Ranges -->
+          <!-- Item 4: Excluded IP Ranges -->
           <div class="collapsed-icon-btn" title="Excluded IP Ranges" onclick="selectSectionFromCollapsed('accExcludedIPs', event)">
             <svg viewBox="0 0 24 24" width="19" height="19" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -3045,20 +3260,6 @@ tbody tr:hover .copy-ip-btn {
 
       <!-- Panel Content -->
       <div class="card-content" style="margin-top: 1.25rem;">
-        
-        <!-- SECTION 1: ANALYST PROFILE -->
-        <div class="analyst-profile-section" style="padding: 10px 12px; background: rgba(0, 240, 255, 0.02); border: 1px solid rgba(0, 240, 255, 0.12); border-radius: 8px; margin-bottom: 12px;">
-          <div class="analyst-meta" style="margin-bottom: 4px;">
-            <!-- Hidden elements to preserve JS compatibility with user display names -->
-            <div id="analystInitials" style="display: none !important;">AN</div>
-            <div class="analyst-info" style="width: 100%;">
-              <span class="analyst-name" id="analystDisplayName" style="font-size: 13px; font-weight: 700; color: var(--text); display: block; text-align: center; margin-bottom: 2px;">SecOps Analyst</span>
-              <span id="analystUsername" style="display: none !important;">@analyst</span>
-            </div>
-          </div>
-          
-          <button class="logout-btn" onclick="signOutAnalyst()" style="width: 100%; margin-top: 2px; padding: 4px 10px; display: flex; align-items: center; justify-content: center; gap: 6px;">🔓 Sign Out</button>
-        </div>
 
         <!-- CONSOLIDATED LEFT ACCORDIONS (Reference Image layout) -->
         <div class="left-accordion-list">
@@ -4943,6 +5144,7 @@ function processIPList() {
   updateCountryFilterDropdown();
   document.getElementById('scanBtn').disabled = false;
   toast(`Loaded ${filteredData.length} unique IPs — ready to scan`);
+  toggleSidebar(false);
 }
 
 function parseFullDateTime(val) {
@@ -5288,11 +5490,11 @@ function processData(parsed) {
     updateStatsAndTable();
     updateCharts();
     toast(`Successfully loaded pre-scanned report with ${filteredData.length} records`);
-    toggleSidebar(true);
   } else {
     document.getElementById('scanBtn').disabled = false;
     toast(`Filtered: ${filteredData.length} unique IPs ready to scan`);
   }
+  toggleSidebar(false);
 }
 function resetUI() {
   document.getElementById('statsPanel').style.display = 'none';
@@ -6428,7 +6630,7 @@ function exportToCSV() {
 
   // Total
   csvRows.push(getCsvSummaryRow('Total', rows.length));
-  csvRows.push(getCvSpacer());
+  csvRows.push(getCsvSpacer());
 
   const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -6646,7 +6848,7 @@ async function handleWeeklyReportUpload(file) {
     window.weeklyUploadFileName = file.name;
     renderWeeklyReportPreview();
     toast('Weekly report ready!', 'toast-success');
-    toggleSidebar(true);
+    toggleSidebar(false);
   } catch (err) {
     console.error(err);
     toast('Error parsing file: ' + err.message, 'toast-error');
@@ -7085,12 +7287,16 @@ async function initAuth() {
   let users = {};
   if (usersStr) {
     users = JSON.parse(usersStr);
+    if (users['admin'] && users['admin'].name === 'Chief Analyst') {
+      users['admin'].name = 'SOC Analyst';
+      localStorage.setItem('analyst_users', JSON.stringify(users));
+    }
   } else {
     // Seed default administrator
     users['admin'] = {
       username: 'admin',
       password: 'admin',
-      name: 'Chief Analyst',
+      name: 'SOC Analyst',
       apiKey: '',
       abuseApiKey: '',
       threshold: 3,
@@ -7102,16 +7308,20 @@ async function initAuth() {
     localStorage.setItem('analyst_users', JSON.stringify(users));
   }
 
-  // Check active session or set default active Chief Analyst session
+  // Check active session or set default active SOC Analyst session
   const activeSessionStr = localStorage.getItem('current_analyst_user');
   if (activeSessionStr) {
     currentUser = JSON.parse(activeSessionStr);
+    if (currentUser && (currentUser.name === 'Chief Analyst' || !currentUser.name)) {
+      currentUser.name = 'SOC Analyst';
+      localStorage.setItem('current_analyst_user', JSON.stringify(currentUser));
+    }
   } else {
-    // Auto-login default Chief Analyst session with embedded keys by default
+    // Auto-login default SOC Analyst session with embedded keys by default
     currentUser = {
       username: 'admin',
       password: 'admin',
-      name: 'Chief Analyst',
+      name: 'SOC Analyst',
       apiKey: '',
       abuseApiKey: '',
       threshold: 3,
@@ -7146,8 +7356,11 @@ function showDashboard() {
   
   // Render user initials and user labels
   if (currentUser) {
-    document.getElementById('analystDisplayName').textContent = currentUser.name || 'SecOps Analyst';
-    document.getElementById('analystUsername').textContent = '@' + currentUser.username;
+    const displayNameEl = document.getElementById('analystDisplayName');
+    if (displayNameEl) displayNameEl.textContent = currentUser.name || 'SOC Analyst';
+    
+    const usernameEl = document.getElementById('analystUsername');
+    if (usernameEl) usernameEl.textContent = '@' + currentUser.username;
     
     const collapsedProfileName = document.getElementById('collapsedProfileName');
     if (collapsedProfileName) {
@@ -7160,7 +7373,9 @@ function showDashboard() {
       .join('')
       .toUpperCase()
       .slice(0, 2);
-    document.getElementById('analystInitials').textContent = initials;
+    const initialsEl = document.getElementById('analystInitials');
+    if (initialsEl) initialsEl.textContent = initials;
+    
     const collapsedAv = document.getElementById('collapsedUserAvatar');
     if (collapsedAv) collapsedAv.textContent = initials;
     
@@ -7604,11 +7819,11 @@ function signOutAnalyst() {
   localStorage.removeItem('current_analyst_user');
   currentUser = null;
   // Clear layout inputs
-  document.getElementById('signinUsername').value = '';
-  document.getElementById('signinPassword').value = '';
-  document.getElementById('registerName').value = '';
-  document.getElementById('registerPassword').value = '';
-  document.getElementById('registerApiKey').value = '';
+  if (document.getElementById('signinUsername')) document.getElementById('signinUsername').value = '';
+  if (document.getElementById('signinPassword')) document.getElementById('signinPassword').value = '';
+  if (document.getElementById('registerName')) document.getElementById('registerName').value = '';
+  if (document.getElementById('registerPassword')) document.getElementById('registerPassword').value = '';
+  if (document.getElementById('registerApiKey')) document.getElementById('registerApiKey').value = '';
   if (document.getElementById('registerAbuseApiKey')) document.getElementById('registerAbuseApiKey').value = '';
   
   showAuthScreen();

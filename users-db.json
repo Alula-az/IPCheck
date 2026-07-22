@@ -1,0 +1,39 @@
+{
+  "admin": {
+    "username": "admin",
+    "password": "admin",
+    "name": "SOC Analyst",
+    "apiKey": "",
+    "abuseApiKey": "",
+    "threshold": 3,
+    "abuseThreshold": 30,
+    "skipAbuseIfVTEnabled": true,
+    "allowedVendors": [
+      "apache",
+      "Cisco ISE",
+      "firewall"
+    ],
+    "excludedIPs": [
+      "10"
+    ]
+  },
+  "file_pfqq60": {
+    "username": "file_pfqq60",
+    "password": "pass_file_pfqq60",
+    "name": "Key Verified Analyst",
+    "apiKey": "415e00b75c5197f5e7fee7a162eb1d6b3296eeb86b73a2e9f01ab340f6ddf24a",
+    "abuseApiKey": "40d64fe7f9f50624dcc558fb239a07d920e07ae88c1624460c268cb429ac34ffa04554974c39ed6a",
+    "threshold": 3,
+    "abuseThreshold": 30,
+    "skipAbuseIfVTEnabled": true,
+    "allowedVendors": [
+      "apache",
+      "Cisco ISE",
+      "firewall"
+    ],
+    "excludedIPs": [
+      "10",
+      "127"
+    ]
+  }
+}
