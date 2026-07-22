@@ -5577,7 +5577,11 @@ async function checkVTIP(ip) {
       ? `/api/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
       : `/api/scan?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
-    if (!res.ok) return { error: `HTTP ${res.status}` };
+    if (!res.ok) {
+      let errText = `HTTP ${res.status}`;
+      try { const d = await res.json(); if (d && d.error) errText = d.error; } catch(e){}
+      return { error: errText };
+    }
     const data = await res.json();
     if (data && !data.error && data.pct !== undefined) setCache(ip, data);
     return data;
@@ -5591,7 +5595,11 @@ async function checkAbuseIPDB(ip) {
       ? `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}&key=${encodeURIComponent(customKey)}`
       : `/api/abuseipdb/scan?ip=${encodeURIComponent(ip)}`;
     const res = await fetch(url);
-    if (!res.ok) return { error: `HTTP ${res.status}` };
+    if (!res.ok) {
+      let errText = `HTTP ${res.status}`;
+      try { const d = await res.json(); if (d && d.error) errText = d.error; } catch(e){}
+      return { error: errText };
+    }
     const data = await res.json();
     return data;
   } catch (e) { return { error: e.message || 'Fetch failed' }; }

@@ -93,25 +93,49 @@ function getGeminiClient(): GoogleGenAI {
 
 function fetchVT(ip: string, apiKey: string): Promise<any> {
   return new Promise((resolve) => {
+    let done = false;
+    const safeResolve = (val: any) => {
+      if (!done) {
+        done = true;
+        resolve(val);
+      }
+    };
+
     const options = {
       hostname: "www.virustotal.com",
       path: `/api/v3/ip_addresses/${encodeURIComponent(ip)}`,
       method: "GET",
-      headers: { "x-apikey": apiKey, Accept: "application/json" },
+      headers: {
+        "x-apikey": apiKey,
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ThreatIntel/1.0"
+      },
     };
     const req = https.request(options, (res) => {
       let body = "";
       res.on("data", (c) => (body += c));
       res.on("end", () => {
         try {
-          const data = JSON.parse(body);
+          let data: any = {};
+          try {
+            data = JSON.parse(body);
+          } catch {
+            // Body was not valid JSON
+          }
+
           if (res.statusCode === 429) {
-            return resolve({ error: "RATE_LIMITED" });
+            return safeResolve({ error: "RATE_LIMITED" });
+          }
+          if (res.statusCode === 401 || res.statusCode === 403) {
+            const msg = data?.error?.message || "Invalid API key or unauthorized";
+            return safeResolve({ error: `HTTP ${res.statusCode}: ${msg}` });
           }
           if (res.statusCode !== 200) {
-            return resolve({ error: data?.error?.message || `HTTP ${res.statusCode}` });
+            const msg = data?.error?.message || `HTTP ${res.statusCode} Error`;
+            return safeResolve({ error: msg });
           }
-          const attr = data.data.attributes;
+
+          const attr = data.data?.attributes || {};
           const stats = attr.last_analysis_stats || {};
           const results = attr.last_analysis_results || {};
           const total =
@@ -137,7 +161,7 @@ function fetchVT(ip: string, apiKey: string): Promise<any> {
             .map(([name]) => name)
             .slice(0, 5);
 
-          resolve({
+          safeResolve({
             pct,
             community,
             country: attr.country || "—",
@@ -153,14 +177,14 @@ function fetchVT(ip: string, apiKey: string): Promise<any> {
             vtLink: `https://www.virustotal.com/gui/ip-address/${ip}`,
           });
         } catch (e: any) {
-          resolve({ error: "Parse error: " + e.message });
+          safeResolve({ error: "Error parsing response: " + e.message });
         }
       });
     });
-    req.on("error", (e) => resolve({ error: e.message }));
+    req.on("error", (e) => safeResolve({ error: "Network error: " + e.message }));
     req.setTimeout(15000, () => {
       req.destroy();
-      resolve({ error: "Timeout" });
+      safeResolve({ error: "Request timeout (VirusTotal service reached 15s limit)" });
     });
     req.end();
   });
@@ -170,13 +194,22 @@ const DEFAULT_ABUSE_API_KEY = "40d64fe7f9f50624dcc558fb239a07d920e07ae88c1624460
 
 function fetchAbuseIPDB(ip: string, apiKey: string): Promise<any> {
   return new Promise((resolve) => {
+    let done = false;
+    const safeResolve = (val: any) => {
+      if (!done) {
+        done = true;
+        resolve(val);
+      }
+    };
+
     const options = {
       hostname: "api.abuseipdb.com",
       path: `/api/v2/check?ipAddress=${encodeURIComponent(ip)}`,
       method: "GET",
       headers: {
         "Key": apiKey,
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ThreatIntel/1.0"
       },
     };
     const req = https.request(options, (res) => {
@@ -184,15 +217,27 @@ function fetchAbuseIPDB(ip: string, apiKey: string): Promise<any> {
       res.on("data", (c) => (body += c));
       res.on("end", () => {
         try {
-          const data = JSON.parse(body);
+          let data: any = {};
+          try {
+            data = JSON.parse(body);
+          } catch {
+            // Body was not valid JSON
+          }
+
           if (res.statusCode === 429) {
-            return resolve({ error: "RATE_LIMITED" });
+            return safeResolve({ error: "RATE_LIMITED" });
+          }
+          if (res.statusCode === 401 || res.statusCode === 403) {
+            const msg = data?.errors?.[0]?.detail || "Authentication failed. Your API key is either missing, incorrect, or revoked.";
+            return safeResolve({ error: `HTTP ${res.statusCode}: ${msg}` });
           }
           if (res.statusCode !== 200) {
-            return resolve({ error: data?.errors?.[0]?.detail || `HTTP ${res.statusCode}` });
+            const msg = data?.errors?.[0]?.detail || `HTTP ${res.statusCode} Error`;
+            return safeResolve({ error: msg });
           }
+
           const checkData = data.data || {};
-          resolve({
+          safeResolve({
             ipAddress: checkData.ipAddress,
             abuseConfidenceScore: checkData.abuseConfidenceScore ?? 0,
             totalReports: checkData.totalReports ?? 0,
@@ -200,21 +245,21 @@ function fetchAbuseIPDB(ip: string, apiKey: string): Promise<any> {
             domain: checkData.domain || "—",
           });
         } catch (e: any) {
-          resolve({ error: "Parse error: " + e.message });
+          safeResolve({ error: "Error parsing response: " + e.message });
         }
       });
     });
-    req.on("error", (e) => resolve({ error: e.message }));
+    req.on("error", (e) => safeResolve({ error: "Network error: " + e.message }));
     req.setTimeout(15000, () => {
       req.destroy();
-      resolve({ error: "Timeout" });
+      safeResolve({ error: "Request timeout (AbuseIPDB service reached 15s limit)" });
     });
     req.end();
   });
 }
 
-// ── ENDPOINT COMPATIBILITY WITH NETLIFY FUNCTIONS ──
-app.get("/.netlify/functions/scan", async (req, res) => {
+// ── ENDPOINTS ──
+const scanHandler = async (req: any, res: any) => {
   const ip = (req.query.ip as string) || "";
   const queryKey = (req.query.key as string) || "";
   const apiKey = queryKey.trim() || DEFAULT_VT_API_KEY;
@@ -223,7 +268,6 @@ app.get("/.netlify/functions/scan", async (req, res) => {
     return res.status(400).json({ error: "Missing ip parameter" });
   }
 
-  // Basic IP format validation before hitting VT
   const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
   if (!ipRegex.test(ip.trim())) {
     return res.status(400).json({ error: "Invalid IP format" });
@@ -231,7 +275,10 @@ app.get("/.netlify/functions/scan", async (req, res) => {
 
   const result = await fetchVT(ip.trim(), apiKey);
   res.json(result);
-});
+};
+
+app.get("/api/scan", scanHandler);
+app.get("/.netlify/functions/scan", scanHandler);
 
 const abuseHandler = async (req: any, res: any) => {
   const ip = (req.query.ip as string) || "";
