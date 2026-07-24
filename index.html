@@ -5245,83 +5245,24 @@ function filterData(input) {
     });
 
     // 2. Check if the "Event Annotation Flags" column exists and has "closed;hidden" values
-    let hasAnnotationFlags = false;
-    for (const row of filteredInput) {
-      if (getEventAnnotationFlagsValue(row) === 'closed;hidden') {
-        hasAnnotationFlags = true;
-        break;
+    const closedIndices = [];
+    filteredInput.forEach((row, idx) => {
+      const flagVal = getEventAnnotationFlagsValue(row).toLowerCase();
+      if (flagVal.includes('closed;hidden') || flagVal.includes('closed')) {
+        closedIndices.push(idx);
       }
-    }
+    });
 
-    if (hasAnnotationFlags) {
-      const candidates = [];
-      for (const row of filteredInput) {
-        const flagVal = getEventAnnotationFlagsValue(row);
-        if (flagVal === 'closed;hidden') {
-          const t = getEndTimeTimestamp(row);
-          if (t > 0) {
-            candidates.push({ row, time: t, dateStr: getLocalDateString(t) });
-          }
-        }
-      }
+    if (closedIndices.length > 0) {
+      // The first closed;hidden row encountered in descending order is today's closing row (inclusive)
+      const todayClosedIndex = closedIndices[0];
 
-      // Sort candidates descending by time
-      candidates.sort((a, b) => b.time - a.time);
+      // The second closed;hidden row encountered in descending order is last day's closing row (exclusive)
+      // If there is no second closed;hidden row, slice up to the end of the array
+      const lastDayClosedIndex = closedIndices.length > 1 ? closedIndices[1] : filteredInput.length;
 
-      let todayBoundaryTime = null;
-      let yesterdayBoundaryTime = null;
-
-      if (candidates.length > 0) {
-        // Find the max date in the sorted descending dataset using End Time
-        let maxDatasetDateStr = '';
-        if (filteredInput.length > 0) {
-          const maxTime = getEndTimeTimestamp(filteredInput[0]);
-          if (maxTime > 0) {
-            maxDatasetDateStr = getLocalDateString(maxTime);
-          }
-        }
-
-        // Identify boundaries
-        for (const cand of candidates) {
-          if (cand.dateStr === maxDatasetDateStr) {
-            if (todayBoundaryTime === null) {
-              todayBoundaryTime = cand.time;
-            }
-          } else {
-            if (yesterdayBoundaryTime === null) {
-              yesterdayBoundaryTime = cand.time;
-            }
-          }
-        }
-      }
-
-      // Apply the boundaries
-      filteredInput = filteredInput.filter(row => {
-        const tEnd = getEndTimeTimestamp(row);
-        const tMgr = parseFullDateTime(row['Manager Receipt Time'] || row['managerReceiptTime'] || '');
-
-        // 1. Check End Time boundary
-        if (tEnd > 0) {
-          if (todayBoundaryTime !== null && tEnd > todayBoundaryTime) {
-            return false; // Discard rows above today's boundary (newer events)
-          }
-          if (yesterdayBoundaryTime !== null && tEnd <= yesterdayBoundaryTime) {
-            return false; // Discard yesterday's boundary row itself and all rows below (older events)
-          }
-        }
-
-        // 2. Check Manager Receipt Time boundary to ensure consistency
-        if (tMgr > 0) {
-          if (todayBoundaryTime !== null && tMgr > todayBoundaryTime) {
-            return false; // Discard rows above today's boundary (newer events)
-          }
-          if (yesterdayBoundaryTime !== null && tMgr <= yesterdayBoundaryTime) {
-            return false; // Discard yesterday's boundary row itself and all rows below (older events)
-          }
-        }
-
-        return true;
-      });
+      // Keep only rows from today's closed;hidden row (inclusive) up to last day's closed;hidden row (exclusive)
+      filteredInput = filteredInput.slice(todayClosedIndex, lastDayClosedIndex);
 
       // Remove the Event Annotation Flags column from the kept rows
       for (const row of filteredInput) {
@@ -5334,7 +5275,7 @@ function filterData(input) {
 
       const removedCount = input.length - filteredInput.length;
       if (removedCount > 0) {
-        applied.add(`Applied Event Annotation Flags boundary filter (removed ${removedCount} rows)`);
+        applied.add(`Applied Event Annotation Flags boundary filter (kept rows from today's closing mark up to last day's closing mark, removed ${removedCount} rows)`);
       }
     }
   }
